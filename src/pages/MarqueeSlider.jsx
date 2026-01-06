@@ -1,0 +1,5167 @@
+// import React, { useState, useEffect, useRef } from "react";
+// import { FiChevronLeft, FiChevronRight, FiShoppingCart } from "react-icons/fi";
+// import { Link } from "react-router-dom";
+// import { useCart } from "../context/CartContext";
+
+// const MarqueeSlider = ({ products = [] }) => {
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [isPaused, setIsPaused] = useState(false);
+//   const slideInterval = useRef(null);
+//   const { addToCart } = useCart();
+
+//   // Auto slide every 3 seconds
+//   const autoSlideDuration = 3000;
+
+//   // Responsive slides per view
+//   const getSlidesPerView = () => {
+//     if (window.innerWidth >= 1024) return 4; // Desktop
+//     if (window.innerWidth >= 768) return 3; // Tablet
+//     if (window.innerWidth >= 640) return 2; // Mobile landscape
+//     return 1; // Mobile portrait
+//   };
+
+//   const [slidesPerView, setSlidesPerView] = useState(getSlidesPerView());
+//   const totalSlides = Math.ceil(products.length / slidesPerView);
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       setSlidesPerView(getSlidesPerView());
+//       // Reset to first slide on resize to avoid overflow
+//       setCurrentIndex(0);
+//     };
+
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, []);
+
+//   // Auto slide functionality
+//   useEffect(() => {
+//     if (!isPaused && products.length > 0) {
+//       slideInterval.current = setInterval(() => {
+//         nextSlide();
+//       }, autoSlideDuration);
+//     }
+
+//     return () => {
+//       if (slideInterval.current) {
+//         clearInterval(slideInterval.current);
+//       }
+//     };
+//   }, [currentIndex, isPaused, products.length, slidesPerView]);
+
+//   const nextSlide = () => {
+//     setCurrentIndex((prevIndex) =>
+//       prevIndex === totalSlides - 1 ? 0 : prevIndex + 1
+//     );
+//   };
+
+//   const prevSlide = () => {
+//     setCurrentIndex((prevIndex) =>
+//       prevIndex === 0 ? totalSlides - 1 : prevIndex - 1
+//     );
+//   };
+
+//   const goToSlide = (index) => {
+//     setCurrentIndex(index);
+//   };
+
+//   const handleAddToCart = (product, e) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     addToCart(product);
+//   };
+
+//   const handleMouseEnter = () => {
+//     setIsPaused(true);
+//     if (slideInterval.current) {
+//       clearInterval(slideInterval.current);
+//     }
+//   };
+
+//   const handleMouseLeave = () => {
+//     setIsPaused(false);
+//   };
+
+//   if (products.length === 0) {
+//     return (
+//       <div className="text-center py-12">
+//         <p className="text-gray-500">No products available</p>
+//       </div>
+//     );
+//   }
+
+//   // Calculate which products to show based on current index
+//   const startIndex = currentIndex * slidesPerView;
+//   const visibleProducts = products.slice(
+//     startIndex,
+//     startIndex + slidesPerView
+//   );
+
+//   return (
+//     <div
+//       className="relative px-4 md:px-8 lg:px-12 py-8 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl shadow-lg"
+//       onMouseEnter={handleMouseEnter}
+//       onMouseLeave={handleMouseLeave}
+//     >
+//       {/* Header with title and controls */}
+//       <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+//         <div className="mb-4 sm:mb-0">
+//           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+//             Featured Products
+//           </h2>
+//           <p className="text-gray-600 mt-1">
+//             Discover our best selling pharmaceutical products
+//           </p>
+//         </div>
+
+//         {/* Navigation buttons */}
+//         <div className="flex items-center space-x-4">
+//           <div className="flex space-x-2">
+//             <button
+//               onClick={prevSlide}
+//               className="p-2 md:p-3 bg-white border border-gray-300 rounded-full shadow-md hover:bg-blue-50 hover:border-blue-500 transition-all duration-300 transform hover:-translate-x-0.5 active:scale-95"
+//               aria-label="Previous slide"
+//             >
+//               <FiChevronLeft className="text-gray-700 text-lg md:text-xl" />
+//             </button>
+//             <button
+//               onClick={nextSlide}
+//               className="p-2 md:p-3 bg-white border border-gray-300 rounded-full shadow-md hover:bg-blue-50 hover:border-blue-500 transition-all duration-300 transform hover:translate-x-0.5 active:scale-95"
+//               aria-label="Next slide"
+//             >
+//               <FiChevronRight className="text-gray-700 text-lg md:text-xl" />
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Products grid */}
+//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+//         {visibleProducts.map((product) => (
+//           <div
+//             key={product.id}
+//             className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden group"
+//           >
+//             {/* Product image */}
+//             <div className="relative h-48 md:h-56 overflow-hidden">
+//               <img
+//                 src={product.image}
+//                 alt={product.title}
+//                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+//                 onError={(e) => {
+//                   e.target.src = `https://via.placeholder.com/400x300/3b82f6/ffffff?text=${encodeURIComponent(
+//                     product.title
+//                   )}`;
+//                 }}
+//               />
+//               {/* Company badge */}
+//               <div className="absolute top-3 right-3">
+//                 <span className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full shadow-md">
+//                   {product.company}
+//                 </span>
+//               </div>
+//             </div>
+
+//             {/* Product info */}
+//             <div className="p-4 md:p-6">
+//               <div className="flex justify-between items-start mb-3">
+//                 <h3 className="font-bold text-gray-900 text-sm md:text-base line-clamp-1 flex-1 mr-2">
+//                   {product.title}
+//                 </h3>
+//                 <div className="text-blue-900 font-bold text-base md:text-lg whitespace-nowrap">
+//                   ${product.price.toFixed(2)}
+//                 </div>
+//               </div>
+
+//               <div className="mb-4">
+//                 <div className="flex items-center space-x-2 mb-2">
+//                   <span className="text-xs md:text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
+//                     {product.mg}mg
+//                   </span>
+//                   <span className="text-xs md:text-sm text-gray-500">•</span>
+//                   <span className="text-xs md:text-sm text-gray-500 truncate">
+//                     {product.composition}
+//                   </span>
+//                 </div>
+//                 <p className="text-gray-600 text-xs md:text-sm line-clamp-2">
+//                   {product.description}
+//                 </p>
+//               </div>
+
+//               <div className="flex items-center justify-between mb-4">
+//                 <div className="flex items-center text-xs md:text-sm text-gray-500">
+//                   <svg
+//                     className="w-4 h-4 mr-1"
+//                     fill="none"
+//                     stroke="currentColor"
+//                     viewBox="0 0 24 24"
+//                   >
+//                     <path
+//                       strokeLinecap="round"
+//                       strokeLinejoin="round"
+//                       strokeWidth="2"
+//                       d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+//                     />
+//                   </svg>
+//                   {product.packing}
+//                 </div>
+//                 <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800">
+//                   {product.category}
+//                 </span>
+//               </div>
+
+//               {/* Action buttons */}
+//               <div className="flex space-x-3">
+//                 <Link
+//                   to={`/product/${product.id}`}
+//                   className="flex-1 px-3 py-2 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-center text-sm transition duration-300"
+//                 >
+//                   View Details
+//                 </Link>
+//                 <button
+//                   onClick={(e) => handleAddToCart(product, e)}
+//                   className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center text-sm"
+//                 >
+//                   <FiShoppingCart className="mr-2" />
+//                   Add to Cart
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* Slide indicators (dots) */}
+//       <div className="flex justify-center items-center mt-8 space-x-2">
+//         {Array.from({ length: totalSlides }).map((_, index) => (
+//           <button
+//             key={index}
+//             onClick={() => goToSlide(index)}
+//             className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
+//               index === currentIndex
+//                 ? "bg-blue-600 scale-125"
+//                 : "bg-gray-300 hover:bg-gray-400"
+//             }`}
+//             aria-label={`Go to slide ${index + 1}`}
+//           />
+//         ))}
+//       </div>
+
+//       {/* Auto slide status indicator */}
+//       <div className="mt-6 flex justify-center items-center">
+//         <div className="flex items-center space-x-2">
+//           <div
+//             className={`w-3 h-3 rounded-full ${
+//               isPaused ? "bg-yellow-500" : "bg-green-500"
+//             }`}
+//           ></div>
+//           <span className="text-xs text-gray-500">
+//             {isPaused ? "Paused (hovering)" : "Auto-sliding every 3s"}
+//           </span>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default MarqueeSlider;
+
+// MarqueeSlider.jsx - Temporary fix version
+import React, { useState, useEffect, useRef } from "react";
+import { FiChevronLeft, FiChevronRight, FiShoppingCart } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+
+const MarqueeSlider = ({ products = [] }) => {
+  // TEMPORARY SAMPLE DATA - Remove this when passing real data
+  const sampleProducts = [
+    {
+      id: 1,
+      title: "Cenforce 25 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 50.01,
+      description: "Sildenafil citrate 25mg tablets for erectile dysfunction",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/2/490679607/RN/BM/BZ/219238906/cenforce-25mg-tablets-1.jpeg",
+    },
+    {
+      id: 2,
+      title: "Cenforce 50 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 65.99,
+      description: "Sildenafil citrate 50mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/433447388/OP/TM/BT/216502075/cenforce-50.jpeg",
+    },
+    {
+      id: 3,
+      title: "Cenforce 100 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 63.99,
+      description: "Sildenafil citrate 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/2/489938364/DJ/EL/BM/241510120/cenforce-100-mg-tablet-png-500x500.png",
+    },
+    {
+      id: 4,
+      title: "Cenforce 120 Mg",
+      company: "Centurion",
+      packing: "1X5 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 83.99,
+      description: "Sildenafil citrate 120mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/435873448/LH/FX/WM/133082746/cenforce-sildenafil-120mg-tablets.jpg",
+    },
+    {
+      id: 5,
+      title: "Cenforce 130 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 130,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 24.99,
+      description: "Sildenafil citrate 130mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/10/VO/KD/TL/22453657/cenforce-130.jpg",
+    },
+    {
+      id: 6,
+      title: "Cenforce 150 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 150,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 83.99,
+      description: "Sildenafil citrate 150mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/3/404111643/UI/LF/QQ/217031894/cenforce-150-mg-tablets.jpg",
+    },
+    {
+      id: 7,
+      title: "Cenforce 200 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 88.99,
+      description: "Sildenafil citrate 200mg tablets",
+      image:
+        "https://rollingout.com/wp-content/uploads/2024/03/Taking-Cenforce-200-is-like-never-ending-your-physical-life.jpg",
+    },
+    {
+      id: 8,
+      title: "Cenforce FM 100 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 21.99,
+      description: "Sildenafil for female use",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/420091064/ZE/DH/FH/211306957/cenforce-fm-tablets-1633598162-6027355-500x500.jpg",
+    },
+    {
+      id: 9,
+      title: "Cenforce Soft 100 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 78.99,
+      description: "Soft chewable sildenafil tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/7/EL/OD/GU/75459511/whatsapp-image-2022-07-22-at-11-49-56-am-1-.jpeg",
+    },
+    {
+      id: 10,
+      title: "Cenforce Professional 100 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 80.99,
+      description: "Professional grade sildenafil",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/8/JY/AP/IS/47746368/cenforce-professional-500x500.jpeg",
+    },
+    {
+      id: 11,
+      title: "Cenforce Gold 100 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 28.99,
+      description: "Premium gold version sildenafil",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/9/542795484/JZ/XM/GV/242968832/cenforce-gold-100-mg.jpg",
+    },
+    {
+      id: 12,
+      title: "Cenforce LD (S50/D30)",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "50/30",
+      composition: "Sildenafil (50) Dapoxetine(30)",
+      category: "Sildenafil",
+      price: 34.99,
+      description: "Combination therapy for ED and PE",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/3/498512061/YD/AD/JC/242743971/cenforce-ld-tablet-500x500.jpg",
+    },
+    {
+      id: 13,
+      title: "Cenforce D (S100/D60)",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil (100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 42.99,
+      description: "Dual action for ED and premature ejaculation",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/3/498512061/YD/AD/JC/242743971/cenforce-ld-tablet-500x500.jpg",
+    },
+    {
+      id: 14,
+      title: "Blueforce 25 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 87.99,
+      description: "Blueforce sildenafil 25mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/447599307/AF/SU/IX/229364765/blueforce-25-mg-sildenafil-tablet.jpg",
+    },
+    {
+      id: 15,
+      title: "Blueforce 50 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 14.99,
+      description: "Blueforce sildenafil 50mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/8/539709015/DU/NC/VU/251862058/blueforce-50-mg-500x500.jpg",
+    },
+    {
+      id: 16,
+      title: "Blueforce 100 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 17.99,
+      description: "Blueforce sildenafil 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/469053997/PU/FF/FF/192270567/blueforce-100-mg-tablets.jpg",
+    },
+    {
+      id: 17,
+      title: "Blueforce 150 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 150,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 22.99,
+      description: "Blueforce sildenafil 150mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/3/498143220/XP/AY/UH/78053037/blueforce-1-150mg-tablet-500x500.jpg",
+    },
+    {
+      id: 18,
+      title: "Blueforce 200 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 26.99,
+      description: "Blueforce sildenafil 200mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/447589508/UH/XL/QZ/229364765/blueforce-200-mg-sildenafil-tablet-500x500.jpg",
+    },
+    {
+      id: 19,
+      title: "Blueforce 250 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 250,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 31.99,
+      description: "Blueforce sildenafil 250mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/451223864/RN/ZF/GD/227801705/blueforce-1-250mg-sildenafil-250-mg-tablets-500x500.jpg",
+    },
+    {
+      id: 20,
+      title: "Kamagra Gold 50 Mg",
+      company: "Ajanta",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 16.99,
+      description: "Kamagra Gold 50mg tablets",
+      image:
+        "https://5.imimg.com/data5/WHATSAPP/Default/2024/6/428805101/IH/ZB/OP/143939559/kamagra-gold-50mg-tablet-500x500.jpeg",
+    },
+    {
+      id: 21,
+      title: "Kamagra Gold 100 Mg",
+      company: "Ajanta",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 114.99,
+      description: "Kamagra Gold 100mg tablets",
+      image:
+        "https://jindalmedicalstore.in/wp-content/uploads/2021/01/Kamagra-Gold-100-2-1-1200x1200.jpg",
+    },
+    {
+      id: 22,
+      title: "Kamagra CT Chewable 100 Mg",
+      company: "Ajanta",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 136.99,
+      description: "Chewable Kamagra tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/505844746/RE/UO/QF/240380123/kamagra-ct-chewable-1x4.jpg",
+    },
+    {
+      id: 23,
+      title: "Kamagra Polo 100 Mg",
+      company: "Ajanta",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 129.99,
+      description: "Polo mint flavored Kamagra",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/6/313167914/PG/KI/SE/9469980/kamagra-polo.png",
+    },
+    {
+      id: 24,
+      title: "Kamagra Effervescent 100 Mg",
+      company: "Ajanta",
+      packing: "1X7 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 35.99,
+      description: "Effervescent Kamagra tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/11/EN/EA/XM/64730033/kamagra-effervescent-100-mg-tablets.jpg",
+    },
+    {
+      id: 25,
+      title: "Super Kamagra (S100/D60)",
+      company: "Ajanta",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 190.99,
+      description: "Super Kamagra combination therapy",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/2/393402146/ZI/XX/YD/6796833/super-kamagra-tablets.jpeg",
+    },
+    {
+      id: 26,
+      title: "Kamagra Oral Jelly 100 Mg",
+      company: "Ajanta",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 34.99,
+      description: "Kamagra oral jelly sachets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/DI/BD/VO/131692438/kamagra-oral-jelly-100-mg-500x500.jpeg",
+    },
+    {
+      id: 27,
+      title: "Kamagra Oral Jelly 100 Mg Vol 2",
+      company: "Ajanta",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 36.99,
+      description: "Kamagra oral jelly volume 2",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/468469447/OE/FT/AE/152987101/kamagra-oral-jelly-vol-2-500x500.jpg",
+    },
+    {
+      id: 28,
+      title: "Super Kamagra Jelly(S100/D60)",
+      company: "Ajanta",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 52.99,
+      description: "Super Kamagra oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/518519140/DT/HB/OK/15666310/super-kamagra-oral-jelly.jpeg",
+    },
+    {
+      id: 29,
+      title: "Lovegra Oral Jelly 100 Mg",
+      company: "Ajanta",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 33.99,
+      description: "Lovegra for female sexual health",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/454126580/HL/AB/XE/224432311/lovegra-oral-jelly-sildenafil-jelly.jpg",
+    },
+    {
+      id: 30,
+      title: "Malegra 25 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 58.99,
+      description: "Malegra 25mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/1/ZT/XO/JP/942830/malegra-25-mg-500x500.jpeg",
+    },
+    {
+      id: 31,
+      title: "Malegra 50 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 60.99,
+      description: "Malegra 50mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/1/379790138/IL/ZF/ZA/29488980/1.jpg",
+    },
+    {
+      id: 32,
+      title: "Malegra 100 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 95.99,
+      description: "Malegra 100mg tablets",
+      image:
+        "https://cmedia.cheapmedicineshop.com/media/catalog/product/cache/3ece73ba11197967e54f8a0f57c00f4b/m/a/malegra_100_mg_with_sildenafil_citrate.jpeg.webp",
+    },
+    {
+      id: 33,
+      title: "Malegra 120 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 82.99,
+      description: "Malegra 120mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/467209265/UR/FB/FV/233289434/malegra-120-500x500.jpg",
+    },
+    {
+      id: 34,
+      title: "Malegra 150 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 150,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 23.99,
+      description: "Malegra 150mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/508041639/NS/QZ/WA/189225141/malegra-150-mg-tablet.png",
+    },
+    {
+      id: 35,
+      title: "Malegra 200 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 107.99,
+      description: "Malegra 200mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/8/334423780/OM/SX/QV/151454344/malegra-200mg-tablet.png",
+    },
+    {
+      id: 36,
+      title: "Malegra Pro 50 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 17.99,
+      description: "Malegra Pro 50mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/506392933/YC/EB/BB/213160128/50mg-malegra-pro-tablet.jpg",
+    },
+    {
+      id: 37,
+      title: "Malegra Pro 100 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 20.99,
+      description: "Malegra Pro 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/1/OX/UA/DJ/942830/malegra-pro-100.jpg",
+    },
+    {
+      id: 38,
+      title: "Malegra Green 100 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 19.99,
+      description: "Malegra Green 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/11/UJ/SQ/OL/147460468/malegra-green-100-mg-tablet.JPG",
+    },
+    {
+      id: 39,
+      title: "Malegra Gold 100 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 22.99,
+      description: "Malegra Gold 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/457332930/OL/CU/VJ/8396705/malegra-gold-100-mg-500x500.png",
+    },
+    {
+      id: 40,
+      title: "Malegra Effervescent 100 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 28.99,
+      description: "Malegra effervescent tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/458110638/IS/AM/EM/229278019/malegra-100-effervescent-tablets.jpg",
+    },
+    {
+      id: 41,
+      title: "Malegra DXT (S100/D30)",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/30",
+      composition: "Sildenafil(100) Dapoxetine(30)",
+      category: "Sildenafil",
+      price: 35.99,
+      description: "Malegra DXT combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/8/336633451/BW/NU/WU/137231267/malegra-dxt-sildenafil-100mg-with-duloxetine-30mg.png",
+    },
+    {
+      id: 42,
+      title: "Malegra DXT Plus(S100/D60)",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 101.99,
+      description: "Malegra DXT Plus combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/6/318888250/QN/CG/JQ/80223653/malegra-dxt-plus-sildenafil-duloxetine-.jpg",
+    },
+    {
+      id: 43,
+      title: "Malegra FXT(S100/F40)",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/40",
+      composition: "Sildenafil(100) Flouxetine(40)",
+      category: "Sildenafil",
+      price: 100.99,
+      description: "Malegra FXT with Flouxetine",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/452442146/OT/ZB/ZT/223075158/malegra-fxt-sildenafil-100mg-with-fluoxetine-40-mg.jpg",
+    },
+    {
+      id: 44,
+      title: "Malegra FXT Plus(S100/F60)",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Flouxetine(60)",
+      category: "Sildenafil",
+      price: 45.99,
+      description: "Malegra FXT Plus with Flouxetine",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/469608148/GU/HQ/IK/201346457/malegra-fxt-plus-sildenafil-100-mg-and-fluoxetine-60-mg-tablets.jpg",
+    },
+    {
+      id: 45,
+      title: "Malegra Oral Jelly 100 Mg",
+      company: "Sunrise",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 31.99,
+      description: "Malegra oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/467208878/VX/IB/MT/233289434/malegra-100-oral-jelly-500x500.jpg",
+    },
+    {
+      id: 46,
+      title: "Femalegra 100 Mg",
+      company: "Sunrise",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 77.99,
+      description: "Femalegra for women",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/3/499321149/LO/IT/QB/111745939/28.png",
+    },
+    {
+      id: 47,
+      title: "Chocogra Chewable 100 Mg",
+      company: "Sunrise",
+      packing: "1X5 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 25.99,
+      description: "Chocolate flavored chewable",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/12/372998596/NX/GO/MU/204464971/chocogra-chewable-sildenafil-chewable-100-mg-delicious-chocolate.jpg",
+    },
+    {
+      id: 48,
+      title: "P-Force Fort 150 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 150,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 83.99,
+      description: "P-Force Fort 150mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/12/370155138/QP/LQ/RB/204464971/p-force-fort-sildenafil-3.jpg",
+    },
+    {
+      id: 49,
+      title: "Super P Force (S100/D60)",
+      company: "Sunrise",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 160.99,
+      description: "Super P Force combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/9/542136379/WQ/IE/SU/244791314/super-p-force-s100-d60-tablet.jpg",
+    },
+    {
+      id: 50,
+      title: "Extra Super P Force (S100/D100)",
+      company: "Sunrise",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "100/100",
+      composition: "Sildenafil(100) Dapoxetine(100)",
+      category: "Sildenafil",
+      price: 53.99,
+      description: "Extra Super P Force",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/531890809/IF/HV/JQ/61269834/extra-super-p-force-tablets.jpg",
+    },
+    {
+      id: 51,
+      title: "Fildena 25 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 59.49,
+      description: "Fildena 25mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/10/CC/XK/IA/154492060/fildena-25-mg.webp",
+    },
+    {
+      id: 52,
+      title: "Fildena 50 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 65.49,
+      description: "Fildena 50mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/428176189/EQ/WA/FS/116132422/fildena-50-mg.png",
+    },
+    {
+      id: 53,
+      title: "Fildena 100 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 78.49,
+      description: "Fildena 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/428048422/OB/PE/MS/116132422/fildena-100-mg.png",
+    },
+    {
+      id: 54,
+      title: "Fildena Strong 120 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 21.49,
+      description: "Fildena Strong 120mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/3/400963835/ON/YD/YM/154492060/fildena-strong-120.jpg",
+    },
+    {
+      id: 55,
+      title: "Fildena Extra Power 150 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 150,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 24.49,
+      description: "Fildena Extra Power 150mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/447874703/YD/CF/HZ/194976041/fildena-extra-power-150-mg-tablet-500x500.jpeg",
+    },
+    {
+      id: 56,
+      title: "Fildena Double 200 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 28.49,
+      description: "Fildena Double 200mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/428185422/RF/QM/HE/116132422/fildena-double-200-mg.png",
+    },
+    {
+      id: 57,
+      title: "Fildena Chewable CT 50 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 63.49,
+      description: "Fildena chewable 50mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/415419630/VP/VE/TX/4794823/fildena-ct-100mg-tablet-sildenafil-citrate.jpg",
+    },
+    {
+      id: 58,
+      title: "Fildena Chewable CT 100 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 21.49,
+      description: "Fildena chewable 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/509763095/QQ/XK/CW/152986451/fildena-ct-50-mg-sildenafil-citrate-chewable-tablets.jpg",
+    },
+    {
+      id: 59,
+      title: "Fildena XXX Fruit Chewable 100 Mg",
+      company: "Fortune",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 22.99,
+      description: "Fildena XXX fruit chewable",
+      image:
+        "https://media.goodrxmedicine.com/media/catalog/product/cache/74c1057f7991b4edb2bc7bdaa94de933/f/i/fildena-xxx-100-mg-1-with-medicine.png",
+    },
+    {
+      id: 60,
+      title: "Fildena Professional 100 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 87.49,
+      description: "Fildena Professional 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/10/350424592/QJ/RF/OC/52939259/fildena-professional-100mg.jpeg",
+    },
+    {
+      id: 61,
+      title: "Fildena Super Active Softgel 100 Mg",
+      company: "Fortune",
+      packing: "10X10 Cap",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 25.99,
+      description: "Fildena super active softgel",
+      image:
+        "https://img500.exportersindia.com/product_images/bc-500/2023/9/10291358/fildena-super-active-100mg-capsules-1688715346-6971404.jpeg",
+    },
+    {
+      id: 62,
+      title: "Super Fildena (S100/D60)",
+      company: "Fortune",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 120.49,
+      description: "Super Fildena combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/8/337254358/OD/RV/ZI/108246308/super-fildena-sildenafil-and-dapoxetine-tablets.jpeg",
+    },
+    {
+      id: 63,
+      title: "Filagra 100 Mg Jelly",
+      company: "Fortune",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 31.49,
+      description: "Filagra oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/478778719/IB/OK/IW/61984086/filagra-100mg-oraljelly.jpeg",
+    },
+    {
+      id: 64,
+      title: "Sildigra 25 Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 10.99,
+      description: "Sildigra 25mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/439330900/VA/LQ/AP/59616023/sildigra-25-mg.jpeg",
+    },
+    {
+      id: 65,
+      title: "Sildigra 50 Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 13.99,
+      description: "Sildigra 50mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/12/JI/DV/FL/9157849/sildigra-50-mg-500x500.jpeg",
+    },
+    {
+      id: 66,
+      title: "Sildigra 100 Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 16.99,
+      description: "Sildigra 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/451719472/ZF/BK/XN/224412585/sildigra-sildenafil-tablets.jpg",
+    },
+    {
+      id: 67,
+      title: "Sildigra 120 Anaconda Mg",
+      company: "Dharam Disributors",
+      packing: "1X5 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 20.99,
+      description: "Sildigra Anaconda 120mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/501173496/NW/RH/NH/6695503/anaconda-sildigra-120-mg.jpeg",
+    },
+    {
+      id: 68,
+      title: "Sildigra 150 XL Plus Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 150,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 23.99,
+      description: "Sildigra 150 XL Plus",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/433025389/VX/NE/JS/12240681/sildigra-xl-plus-150-mg-sildenafil-citrate-tablets.jpg",
+    },
+    {
+      id: 69,
+      title: "Sildigra 200 Gold Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 27.99,
+      description: "Sildigra 200 Gold",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/9/GX/YR/OV/138338908/sildigra-gold-tablets.png",
+    },
+    {
+      id: 70,
+      title: "Sildigra 200 Black Force Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 28.99,
+      description: "Sildigra Black Force 200mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/8/445841177/AN/UP/RR/227150572/sildigra-black-force-200mg.webp",
+    },
+    {
+      id: 71,
+      title: "Sildigra 250 Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 250,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 150.99,
+      description: "Sildigra 250mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/9/541612045/AS/MS/EB/115784864/sildigra-250-mg-sildenafil.png",
+    },
+    {
+      id: 72,
+      title: "Sildigra Soft Gel 100 Mg",
+      company: "Dharam Disributors",
+      packing: "10X10 Cap",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 23.99,
+      description: "Sildigra soft gel capsules",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/10/QV/TI/MQ/9151823/sildigra-softgel-capsules-100mg-sildenafil.png",
+    },
+    {
+      id: 73,
+      title: "Sildigra Super Power (S100/D60)",
+      company: "Dharam Disributors",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 40.99,
+      description: "Sildigra Super Power combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/458260156/HX/GM/BE/227885568/sildigra-super-power.jpg",
+    },
+    {
+      id: 74,
+      title: "Suhagra 25 Mg",
+      company: "Cipla",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 52.99,
+      description: "Suhagra 25mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/456904180/ET/BX/HM/129676423/img-2744.jpeg",
+    },
+    {
+      id: 75,
+      title: "Suhagra 50 Mg",
+      company: "Cipla",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 90.99,
+      description: "Suhagra 50mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/9/348634931/DS/GO/ZO/161423711/suhagra-50-mg-tablets.jpg",
+    },
+    {
+      id: 76,
+      title: "Suhagra 100 Mg",
+      company: "Cipla",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 65.99,
+      description: "Suhagra 100mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/9/UQ/GM/DL/136059498/suhagra-100-mg-tablets.jpg",
+    },
+    {
+      id: 77,
+      title: "Silagra 100 Mg",
+      company: "Cipla",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 100.49,
+      description: "Silagra 100mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/3/SU/WW/LW/943119/2.jpg",
+    },
+    {
+      id: 78,
+      title: "Suhagra Force 50 Mg",
+      company: "Cipla",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "50/30",
+      composition: "Sildenafil(50) Dapoxetine(30)",
+      category: "Sildenafil",
+      price: 32.99,
+      description: "Suhagra Force combination",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_7pcHpoLeUQ62yO3QbMGIytNWnOftuUAzmQ&s",
+    },
+    {
+      id: 79,
+      title: "Siljuv 100 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 15.99,
+      description: "Siljuv 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/1/GC/EE/UT/25738186/siljuv-100mg-sildenafil-tablets-.jpeg",
+    },
+    {
+      id: 80,
+      title: "Siljuv 200 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 24.99,
+      description: "Siljuv 200mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/431705287/KB/DO/XP/154651392/siljuvd.jpg",
+    },
+    {
+      id: 81,
+      title: "Siljuv 50 ODF Mg",
+      company: "Juvenor",
+      packing: "10X10 Strips",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 17.99,
+      description: "Siljuv ODF 50mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/513740335/HK/QB/LI/129074500/untitled-500x500.jpg",
+    },
+    {
+      id: 82,
+      title: "Siljuv D (S100/D60)",
+      company: "Juvenor",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 39.99,
+      description: "Siljuv D combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/519630288/MX/BC/QC/243692227/siljuv-d-s100-d60.jpeg",
+    },
+    {
+      id: 83,
+      title: "Siljuv D Oral Jelly (S100/D60)",
+      company: "Juvenor",
+      packing: "5GmX9 Sach",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 48.99,
+      description: "Siljuv D oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/6/321383534/FX/OO/JW/61269834/minoxidil-tablet.jpg",
+    },
+    {
+      id: 84,
+      title: "Hiforce 25 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 10.49,
+      description: "Hiforce 25mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/514568812/HH/OZ/QM/246100104/hiforce-sildenafil-25mg-1-500x500.jpg",
+    },
+    {
+      id: 85,
+      title: "Hiforce 50 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 13.49,
+      description: "Hiforce 50mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/450019058/ZL/YA/SU/214713665/hiforce-50-tablet.jpg",
+    },
+    {
+      id: 86,
+      title: "Hiforce 100 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 16.49,
+      description: "Hiforce 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/528609633/SD/KY/BU/201346457/hiforce-100-mg-tablet.jpeg",
+    },
+    {
+      id: 87,
+      title: "Hiforce Cobra 120 Mg",
+      company: "Healing Pharma",
+      packing: "1X5 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 20.49,
+      description: "Hiforce Cobra 120mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/5/311518411/KR/FN/TM/185952854/hiforce-cobra-120-tablets.jpg",
+    },
+    {
+      id: 88,
+      title: "Hiforce 200 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 25.99,
+      description: "Hiforce 200mg tablets",
+      image:
+        "https://www.healingpharma.in/wp-content/uploads/2022/11/Hiforce-200.jpg",
+    },
+    {
+      id: 89,
+      title: "Hiforce FM 100 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 18.99,
+      description: "Hiforce FM for females",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/9/342057013/IH/WL/BJ/76813215/hiforce-fm-sienaiitrate-citrate-tablet.jpg",
+    },
+    {
+      id: 90,
+      title: "Hiforce ODS 50 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Strips",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 17.49,
+      description: "Hiforce ODS 50mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/1/LY/BE/FI/147167202/hiforce-50-ods-packaging-size-10-strip.jpg",
+    },
+    {
+      id: 91,
+      title: "Hiforce ODS 100 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Strips",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 95.49,
+      description: "Hiforce ODS 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/8/537831179/LN/QC/SW/152097542/hiforce-100-ods-500x500.png",
+    },
+    {
+      id: 92,
+      title: "Super Hiforce (S100/D60)",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 38.99,
+      description: "Super Hiforce combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/2/ZN/JZ/LY/182508442/hiforce-100-mg-sildenafil-tablets-500x500.jpeg",
+    },
+    {
+      id: 93,
+      title: "Hiforce Oral Jelly 100 Mg",
+      company: "Healing Pharma",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 28.99,
+      description: "Hiforce oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/419464727/LF/JC/EO/3800001/hiforce-sildenafil-100-mg-oral-jelly.jpeg",
+    },
+    {
+      id: 94,
+      title: "Abhiforce 100 Mg",
+      company: "Abhiflex (HAB)",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 170.99,
+      description: "Abhiforce 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/2/RR/HZ/JY/32982871/abhiforce-100mg.jpg",
+    },
+    {
+      id: 95,
+      title: "Abhiforce 150 Mg",
+      company: "Abhiflex (HAB)",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 150,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 88.99,
+      description: "Abhiforce 150mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/2/485904036/WN/TV/LQ/237088981/150mg-abhiforce-sildenafil-tablets.jpeg",
+    },
+    {
+      id: 96,
+      title: "Abhiforce FM 100 Mg",
+      company: "Abhiflex (HAB)",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 18.49,
+      description: "Abhiforce FM 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/9/HL/UU/FY/143252944/abhiforce-fm-100mg-tablets.webp",
+    },
+    {
+      id: 97,
+      title: "Abhiforce D (S100/D60)",
+      company: "Abhiflex (HAB)",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 37.99,
+      description: "Abhiforce D combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/511259852/RY/SO/UX/107248383/abhiforce-d-tablet.jpg",
+    },
+    {
+      id: 98,
+      title: "Abhiforce D Oral Jelly(S100/D60)",
+      company: "Abhiflex (HAB)",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Sildenafil(100) Dapoxetine(60)",
+      category: "Sildenafil",
+      price: 45.99,
+      description: "Abhiforce D oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/519178347/QH/PK/DX/243692227/abhiforce-d-oral-jelly-s100-d60.webp",
+    },
+    {
+      id: 99,
+      title: "Abhigra 100 Mg",
+      company: "Abhiflex (HAB)",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 79.49,
+      description: "Abhigra 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/469447408/BT/PM/XN/193774312/abhigra-100-mg.jpeg",
+    },
+    {
+      id: 100,
+      title: "Abhigra 100 Mg Oral Jelly",
+      company: "Abhiflex (HAB)",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 27.99,
+      description: "Abhigra oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/9/544312926/MP/IM/OD/27892630/abhigra-100mg-sildenafil-oral-jelly.jpeg",
+    },
+    {
+      id: 101,
+      title: "Sildalist (S100/T20)",
+      company: "SBS",
+      packing: "1X6 Tablets",
+      packagingType: "Box",
+      mg: "100/20",
+      composition: "Sildenafil(100) Tadalafil(20)",
+      category: "Sildenafil",
+      price: 180.99,
+      description: "Sildalist dual therapy",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/417193254/ZY/YM/DG/6796833/sildalist-2.jpeg",
+    },
+    {
+      id: 102,
+      title: "Sildalist Strong (S100/T40)",
+      company: "SBS",
+      packing: "1X6 Tablets",
+      packagingType: "Box",
+      mg: "100/40",
+      composition: "Sildenafil(100) Tadalafil(40)",
+      category: "Sildenafil",
+      price: 53.99,
+      description: "Sildalist Strong dual therapy",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/9/542115749/VY/MS/OY/244791314/sildalist-strong-s100-t40-tablet.jpeg",
+    },
+    {
+      id: 103,
+      title: "Tadasiva Extra Power(S100/T20)",
+      company: "Healing/American",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/20",
+      composition: "Sildenafil(100) Tadalafil(20)",
+      category: "Sildenafil",
+      price: 43.99,
+      description: "Tadasiva Extra Power",
+      image: "",
+    },
+    {
+      id: 104,
+      title: "Silvitra(S100/V20)",
+      company: "",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "100/20",
+      composition: "Sildenafil(100) Vardenafil(20)",
+      category: "Sildenafil",
+      price: 83.99,
+      description: "Silvitra combination therapy",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/436056548/NF/VK/XS/65567988/silvitra-120mg-tablet.jpeg",
+    },
+    {
+      id: 105,
+      title: "Sildamax 100 Mg",
+      company: "Agron Iindia LTD",
+      packing: "10x10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 16.99,
+      description: "Sildamax 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/529280077/KB/SP/GL/248131904/100mg-sildamax-sildenafil-citrate-tablets.jpeg",
+    },
+    {
+      id: 106,
+      title: "Zeagra 100 Mg",
+      company: "Zee Drugs",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 54.99,
+      description: "Zeagra 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/481058023/KX/WO/KA/233510459/zeagra-100.jpg",
+    },
+    {
+      id: 107,
+      title: "Da Zeagra (S50/D30)",
+      company: "Zee Drugs",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "50/30",
+      composition: "Sildenafil(50) Dapoxetine(30)",
+      category: "Sildenafil",
+      price: 85.99,
+      description: "Da Zeagra combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/513291290/SW/SR/MW/222847687/da-zeagra-tablet.webp",
+    },
+    {
+      id: 108,
+      title: "Aurogra 100 Mg",
+      company: "Aurochem",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 17.99,
+      description: "Aurogra 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/435271872/GB/WI/SE/155462034/aurogra-100-sildenafil-100-mg.png",
+    },
+    {
+      id: 109,
+      title: "Careforce 100 Mg",
+      company: "Careclub",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 17.49,
+      description: "Careforce 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/8/538842791/UF/XG/KD/30730643/careforce-100-tablet-sildenafil.jpeg",
+    },
+    {
+      id: 110,
+      title: "Careforce 100 Mg ODS",
+      company: "Careclub",
+      packing: "10X10 Strips",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 20.49,
+      description: "Careforce ODS 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/8/538842791/UF/XG/KD/30730643/careforce-100-tablet-sildenafil.jpeg",
+    },
+    {
+      id: 111,
+      title: "Sexforce 100 Mg",
+      company: "Roots Life Care",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 18.99,
+      description: "Sexforce 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/4/412728054/MF/XI/JB/154807381/a1-250x250.jpeg",
+    },
+    {
+      id: 112,
+      title: "Sexforce 100 Mg ODS",
+      company: "Roots Life Care",
+      packing: "1X7 Strips",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 21.99,
+      description: "Sexforce ODS 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/10/356447579/BN/GX/QJ/65567988/sildenafil-100mg-sexforce-100mg-ods.jpeg",
+    },
+    {
+      id: 113,
+      title: "Cobra 120 Mg",
+      company: "Research",
+      packing: "1X5 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 340.99,
+      description: "Cobra 120mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/468317018/BJ/XA/RL/152987101/cobra-120-mg-tablet-250x250.jpg",
+    },
+    {
+      id: 114,
+      title: "Cobra 200 Mg",
+      company: "Research",
+      packing: "1X6 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 93.99,
+      description: "Cobra 200mg",
+      image:
+        "https://media.goodrxmedicine.com/media/catalog/product/cache/c831b74073e8f93ee349897f877fc397/c/o/cobra-200-mg-1.png",
+    },
+    {
+      id: 115,
+      title: "Black Cobra Oral Jelly 100 Mg",
+      company: "",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 29.99,
+      description: "Black Cobra oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/1/TR/EE/KG/9144677/black-cobra-oral-jelly.jpg",
+    },
+    {
+      id: 116,
+      title: "Vega 100 Mg",
+      company: "Signature",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 74.99,
+      description: "Vega 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/517924959/BN/EK/MV/12324131/vega100.jpeg",
+    },
+    {
+      id: 117,
+      title: "Vega Extra Cobra 120 Mg",
+      company: "Signature",
+      packing: "1x5 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 21.99,
+      description: "Vega Extra Cobra 120mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/6/319616196/QY/YY/FZ/135658020/sildenafil-citrate-cobra-120mg-tablet.jpg",
+    },
+    {
+      id: 118,
+      title: "Vega Extra Oral Jelly 120 Mg",
+      company: "Signature",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 31.99,
+      description: "Vega Extra oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/469478376/MY/PS/YE/192593112/vega-extra-oral-jelly.jpeg",
+    },
+    {
+      id: 119,
+      title: "Vega Extra Cobra Oral Jelly 100 Mg",
+      company: "Signature",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 29.99,
+      description: "Vega Cobra oral jelly 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/466202984/CZ/GN/BW/156481202/whatsapp-image-2024-11-18-at-11-56-25-am-4-500x500.jpeg",
+    },
+    {
+      id: 120,
+      title: "Vega Extra Cobra Oral Jelly 120 Mg",
+      company: "Signature",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 34.99,
+      description: "Vega Cobra oral jelly 200mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/503246328/XP/WW/AM/154726424/vega-extra-120-mg-oral-jelly.jpeg",
+    },
+    {
+      id: 121,
+      title: "Vega Extra Cobra ODS120 Mg",
+      company: "Signature",
+      packing: "10X10 Strips",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 22.99,
+      description: "Vega Cobra ODS 120mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/530673390/UH/IP/MQ/249859071/vega-extra-cobra-jelly-120mg.jpeg",
+    },
+    {
+      id: 122,
+      title: "Vigore Red 50 Mg",
+      company: "German Remedies",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 19.99,
+      description: "Vigore Red 50mg",
+      image:
+        "https://prachinayurvedkutir.com/media/catalog/product/cache/52c86a99beffe76b46195b4609975082/v/i/vigore-50.jpeg",
+    },
+    {
+      id: 123,
+      title: "Vigore Red 100 Mg",
+      company: "German Remedies",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 22.99,
+      description: "Vigore Red 100mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/525163883/TU/KQ/YX/15666310/vigore-100-red-tablet-250x250.jpg",
+    },
+    {
+      id: 124,
+      title: "Vigora 50 Mg",
+      company: "German Remedies",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 45.49,
+      description: "Vigora 50mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/431343030/MB/LK/XK/6796833/vigora-50mg-tablets-500x500.webp",
+    },
+    {
+      id: 125,
+      title: "Vigora 100 Mg",
+      company: "German Remedies",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 90.49,
+      description: "Vigora 100mg",
+      image:
+        "https://prachinayurvedkutir.com/media/catalog/product/cache/ad5535a6a6c293c073faeb0653596ba8/p/r/product-jpeg-500x500_1.jpg",
+    },
+    {
+      id: 126,
+      title: "Vigore Jelly 100 Mg",
+      company: "German Remedies",
+      packing: "5GmX5 Sach",
+      packagingType: "Box",
+      mg: 25,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 27.99,
+      description: "Vigore oral jelly",
+      image: "https://m.media-amazon.com/images/I/61s5WUkTyfL.jpg",
+    },
+    {
+      id: 127,
+      title: "Vigore Force (S 50/ D 30)",
+      company: "German Remedies",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "50/30",
+      composition: "Sildenafil(50) Dapoxetine(30)",
+      category: "Sildenafil",
+      price: 31.99,
+      description: "Vigore Force combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/420286458/HM/UB/LK/5575644/vigore-force-50-30mg-tablets.jpeg",
+    },
+    {
+      id: 128,
+      title: "Viagra 50 Mg",
+      company: "Pfizer",
+      packing: "1x2 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 89.99,
+      description: "Original Viagra 50mg",
+      image:
+        "https://prachinayurvedkutir.com/media/catalog/product/cache/ad5535a6a6c293c073faeb0653596ba8/v/i/vigora-50mg.jpg",
+    },
+    {
+      id: 129,
+      title: "Viagra 100 Mg",
+      company: "Pfizer",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Sildenafil",
+      category: "Sildenafil",
+      price: 159.99,
+      description: "Original Viagra 100mg",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnUIVbdcqhvq5jdpUP4bW6bzoNOX1ELxQ65Q&s",
+    },
+    {
+      id: 130,
+      title: "Vidalista 2.5 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 2.5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 54.99,
+      description: "Vidalista 2.5mg daily dose",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/10/PN/ZG/XA/9151823/vidalista-2-5mg.png",
+    },
+    {
+      id: 131,
+      title: "Vidalista 5 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 53.99,
+      description: "Vidalista 5mg daily dose",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/519113720/VU/KK/OL/12324131/vidalista-5mg-10tab-500x500.jpeg",
+    },
+    {
+      id: 132,
+      title: "Vidalista 10 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 0.64,
+      description: "Vidalista 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/11/WH/SX/BF/108376694/vidalista-10-mg-tablets.png",
+    },
+    {
+      id: 133,
+      title: "Vidalista 20 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 70.99,
+      description: "Vidalista 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/11/GK/ZC/VC/108376694/vidalista-20-mg-tablets.png",
+    },
+    {
+      id: 134,
+      title: "Vidalista 40 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 79.99,
+      description: "Vidalista 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/3/OX/ES/HF/7761091/vidalista-tablets-40-mg.png",
+    },
+    {
+      id: 135,
+      title: "Vidalista 60 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 85.99,
+      description: "Vidalista 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/9/542481433/LU/RF/OX/131073059/vidalista-60-tablets.jpg",
+    },
+    {
+      id: 136,
+      title: "Vidalista 80 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 175.99,
+      description: "Vidalista 80mg tablets",
+      image: "https://www.universalhealthindia.com/ProductImage/UN-19_5186.jpg",
+    },
+    {
+      id: 137,
+      title: "Vidalista Black 80 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 75.99,
+      description: "Vidalista Black 80mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/9/DP/TE/LM/122957552/vidalista-80-mg-black-500x500.jpg",
+    },
+    {
+      id: 138,
+      title: "Vidalista CT 20 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 79.99,
+      description: "Vidalista CT 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/470362665/RL/WW/EV/25358643/vidalista-20-mg-tablets.jpg",
+    },
+    {
+      id: 139,
+      title: "Vidalista Professional 20 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 74.99,
+      description: "Vidalista Professional 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/4/303529972/HD/FR/WU/118517374/vidalista-professional.jpeg",
+    },
+    {
+      id: 140,
+      title: "Super Vidalista (T20/D60)",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Tadalafil(20) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 56.99,
+      description: "Super Vidalista combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/528370851/RK/WV/ZS/99413452/super-vidalista-tablets-500x500.png",
+    },
+    {
+      id: 141,
+      title: "Extra Super Vidalista (T40/D60)",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "40/60",
+      composition: "Tadalafil(40) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 69.99,
+      description: "Extra Super Vidalista",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/427524906/GG/PT/FM/116132422/extra-super-vidalista-1.png",
+    },
+    {
+      id: 142,
+      title: "Tadaup 2.5 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 2.5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 15.99,
+      description: "Tadaup 2.5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/427524906/GG/PT/FM/116132422/extra-super-vidalista-1.png",
+    },
+    {
+      id: 143,
+      title: "Tadaup 5 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 18.99,
+      description: "Tadaup 5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/417410322/CJ/NN/JZ/88792944/tadalafil-tadaup-5mg-tablet.jpeg",
+    },
+    {
+      id: 144,
+      title: "Tadaup 10 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 21.99,
+      description: "Tadaup 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/461922456/WN/DS/QZ/71251776/tadaup-10mg-tadalafil-10-mg-10-tablets.jpg",
+    },
+    {
+      id: 145,
+      title: "Tadaup 20 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 24.99,
+      description: "Tadaup 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/477592792/TF/DJ/MC/205460954/tadaup-20-2-500x500.jpg",
+    },
+    {
+      id: 146,
+      title: "Tadaup 40 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 29.99,
+      description: "Tadaup 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/468854952/JZ/XP/ZG/1090199/tadaup-40-mg-tablet-250x250.jpeg",
+    },
+    {
+      id: 147,
+      title: "Tadaup 60 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 34.99,
+      description: "Tadaup 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/9/346795274/OO/JP/MZ/191390162/1.png",
+    },
+    {
+      id: 148,
+      title: "Tadaup 80 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 39.99,
+      description: "Tadaup 80mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/3/492942843/LD/EW/DF/215516762/tadaup-80.jpeg",
+    },
+    {
+      id: 149,
+      title: "Tadalis SX 20 Mg",
+      company: "Ajanta",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 25.99,
+      description: "Tadalis SX 20mg",
+      image:
+        "https://content.jdmagicbox.com/quickquotes/images_main/tadali-tadalafil-20mg-2022810047-d64h0l3j.jpg?impolicy=queryparam&im=Resize=(360,360),aspect=fit",
+    },
+    {
+      id: 150,
+      title: "Super Tadalis SX (T20/D60)",
+      company: "Ajanta",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Tadalafil(20) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 245.99,
+      description: "Super Tadalis SX",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/8/NT/DB/CH/63394803/super-tadalis-sx.webp",
+    },
+    {
+      id: 151,
+      title: "Apcalis SX 20 Mg",
+      company: "Ajanta",
+      packing: "1X2 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 27.99,
+      description: "Apcalis SX 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/3/296839286/AV/HV/LA/154807381/apcalis-sx-20mg-oral-jelly.PNG",
+    },
+    {
+      id: 152,
+      title: "Apcalis SX 20 Mg Oral Jelly",
+      company: "Ajanta",
+      packing: "5GmX7 Sach",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 42.99,
+      description: "Apcalis oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/10/AP/YS/PV/12931111/apcalis-sx-20mg-oral-jelly.png",
+    },
+    {
+      id: 153,
+      title: "Tadarise 2.5 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 2.5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 53.49,
+      description: "Tadarise 2.5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/1/DR/EL/LI/942830/tadarise-2-5mg.jpg",
+    },
+    {
+      id: 154,
+      title: "Tadarise 5 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 93.49,
+      description: "Tadarise 5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/10/EB/WW/YG/154651392/tadarise-5-mg.PNG",
+    },
+    {
+      id: 155,
+      title: "Tadarise 10 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 61.49,
+      description: "Tadarise 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/456255198/IN/HQ/DC/214713665/tadarise-10-mg-tablet.jpg",
+    },
+    {
+      id: 156,
+      title: "Tadarise 20 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 76.49,
+      description: "Tadarise 20mg tablets",
+      image:
+        "https://img1.exportersindia.com/product_images/bc-full/2023/3/3184222/tadarise-20mg-1677841400-6788013.jpeg",
+    },
+    {
+      id: 157,
+      title: "Tadarise 40 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 94.49,
+      description: "Tadarise 40mg tablets",
+      image:
+        "https://jindalmedicalstore.in/wp-content/uploads/2021/02/1-76-1200x900.jpg",
+    },
+    {
+      id: 158,
+      title: "Tadarise 60 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 111.49,
+      description: "Tadarise 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/427535768/TE/LH/UJ/116132422/tadarise-60-mg.png",
+    },
+    {
+      id: 159,
+      title: "Tadarise 80 Black Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 40.99,
+      description: "Tadarise 80 Black",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/455873449/FZ/CM/XY/229278019/tadanova-tadalafil-80mg-black-tablets.jpeg",
+    },
+    {
+      id: 160,
+      title: "Tadarise Professional 20 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 76.99,
+      description: "Tadarise Professional 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/XJ/EY/BM/131692438/tadarise-pro-20-mg-tablet.jpeg",
+    },
+    {
+      id: 161,
+      title: "Tadarise Professional 40 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 33.99,
+      description: "Tadarise Professional 40mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/2/393809402/WE/AV/RH/6796833/tadarise-pro-40mg1.jpg",
+    },
+    {
+      id: 162,
+      title: "Tadarise Effervescent 20 Mg",
+      company: "Sunrise",
+      packing: "1X7 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 38.99,
+      description: "Tadarise effervescent",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/9/347266015/KU/XC/LY/151454344/20mg-tadarise-effervescent-tablets.jpg",
+    },
+    {
+      id: 163,
+      title: "Super Tadarise (T20/D60)",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Tadalafil(20) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 55.99,
+      description: "Super Tadarise combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/4/298572261/LB/UK/LN/184495449/20mg-60mg-super-tadarise-tablet-packaging-size-10-tablets-in-1-strip.JPG",
+    },
+    {
+      id: 164,
+      title: "Extra Super Tadarise (T40/D60)",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "40/60",
+      composition: "Tadalafil(40) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 68.99,
+      description: "Extra Super Tadarise",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/476784032/CB/GF/IV/27503914/extra-super-tadarise.jpeg",
+    },
+    {
+      id: 165,
+      title: "Tadarise Oral Jelly 20 Mg",
+      company: "Sunrise",
+      packing: "5GmX7Sach",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 42.99,
+      description: "Tadarise oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/424546242/SO/YF/IT/211621874/tadarise-20-oral-jelly-500x500.jpg",
+    },
+    {
+      id: 166,
+      title: "Tadasoft 20 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 60.99,
+      description: "Tadasoft 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/468360831/PS/AO/VH/152987101/tadasoft-20mg-tablet.jpg",
+    },
+    {
+      id: 167,
+      title: "Tadasoft 40 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 78.99,
+      description: "Tadasoft 40mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/8/441596321/XV/XK/BQ/152647523/tadasoft-tadalafil-40-mg-soft-amp-flavored.jpeg",
+    },
+    {
+      id: 168,
+      title: "Chocolis Chewable 20 Mg",
+      company: "Sunrise",
+      packing: "1X5 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 30.99,
+      description: "Chocolis chewable tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/8/533679105/OK/KB/QU/151069775/chocolis-chewable-tadalafil-20mg.jpg",
+    },
+    {
+      id: 169,
+      title: "Tadalista 5 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 60.99,
+      description: "Tadalista 5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/RY/LT/FA/131692438/tadalista-5mg-tablet-500x500.jpeg",
+    },
+    {
+      id: 170,
+      title: "Tadalista 10 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 65.99,
+      description: "Tadalista 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/WX/JA/QA/131692438/tadalista-10-mg-tablet-500x500.jpeg",
+    },
+    {
+      id: 171,
+      title: "Tadalista 20 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 80.99,
+      description: "Tadalista 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/473862987/JQ/HD/HB/2313648/tadalista-40mg-tadalafil-tablets.jpg",
+    },
+    {
+      id: 172,
+      title: "Tadalista 40 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 90.99,
+      description: "Tadalista 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/VK/WM/QW/131692438/tadalista-40-mg.jpeg",
+    },
+    {
+      id: 173,
+      title: "Tadalista 60 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 120.99,
+      description: "Tadalista 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/504510812/VE/BW/KT/110473545/60-mg-tadalista-tadalafil-tablets.png",
+    },
+    {
+      id: 174,
+      title: "Tadalista Professional 20 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 80.99,
+      description: "Tadalista Professional 20mg",
+      image:
+        "https://5.imimg.com/data5/IOS/Default/2022/7/MQ/WN/ZE/58622907/product-jpeg.png",
+    },
+    {
+      id: 175,
+      title: "Tadalista Super Activ Softgel 20 Mg",
+      company: "Fortune",
+      packing: "10X10 Cap",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 32.99,
+      description: "Tadalista super active softgel",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/523331947/HV/HD/RW/246239148/tadalista-super-active-capsule-500x500.jpeg",
+    },
+    {
+      id: 176,
+      title: "Tadaflo 5 Mg",
+      company: "Cipla",
+      packing: "1X15 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 22.99,
+      description: "Tadaflo 5mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/7/XL/VQ/OO/71440834/tadaflo-5-tablets-tadalafil-5mg-500x500.jpeg",
+    },
+    {
+      id: 177,
+      title: "Tadaflo 10 Mg",
+      company: "Cipla",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 78.99,
+      description: "Tadaflo 10mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/512157231/CF/TJ/GO/116132422/10-mg-tadaflo-tadalafil-tablets.png",
+    },
+    {
+      id: 178,
+      title: "Tadaflo 20 Mg",
+      company: "Cipla",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 26.99,
+      description: "Tadaflo 20mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/434352957/JQ/IX/WS/46507057/tadaflo-tadalafil-20mg-tablets.png",
+    },
+    {
+      id: 179,
+      title: "Tadacip 20 Mg",
+      company: "Cipla",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 106.99,
+      description: "Tadacip 20mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/501643978/QW/IU/TN/238686879/788888888-500x500.png",
+    },
+    {
+      id: 180,
+      title: "Tadajuv 5 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 18.49,
+      description: "Tadajuv 5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/450032990/PK/MU/JI/211501929/tadajuv-5-mg.jpeg",
+    },
+    {
+      id: 181,
+      title: "Tadajuv 10 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 21.49,
+      description: "Tadajuv 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/421273544/FA/HC/AZ/9397634/tadajuv-10-mg-tablets-500x500.jpg",
+    },
+    {
+      id: 182,
+      title: "Tadajuv 20 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 24.49,
+      description: "Tadajuv 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/451834095/SM/ER/ZU/159419808/tadajuv-tadalafil-tablets.jpeg",
+    },
+    {
+      id: 183,
+      title: "Tadajuv 40 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 29.49,
+      description: "Tadajuv 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/3/293081102/AO/RJ/RV/9144677/tadajuv-40mg-tablet.jpg",
+    },
+    {
+      id: 184,
+      title: "Tadajuv 60 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 34.49,
+      description: "Tadajuv 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/3/397585705/WV/RV/VQ/209823746/tadajuv-60mg-tadalafil-60mg.jpeg",
+    },
+    {
+      id: 185,
+      title: "Tadajuv 80 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 39.49,
+      description: "Tadajuv 80mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/450425456/ML/GW/GF/154492060/tadajuv-80mg.jpeg",
+    },
+    {
+      id: 186,
+      title: "Tadajuv ODF 10 Mg",
+      company: "Juvenor",
+      packing: "10X10 Strip",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 23.49,
+      description: "Tadajuv ODF 10mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/421273544/FA/HC/AZ/9397634/tadajuv-10-mg-tablets-500x500.jpg",
+    },
+    {
+      id: 187,
+      title: "Tadajuv ODF 20 Mg",
+      company: "Juvenor",
+      packing: "10X10 Strip",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 26.49,
+      description: "Tadajuv ODF 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/451834095/SM/ER/ZU/159419808/tadajuv-tadalafil-tablets.jpeg",
+    },
+    {
+      id: 188,
+      title: "Tadajuv D (T20/D60)",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Tadalafil(20) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 54.99,
+      description: "Tadajuv D combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/520300900/IO/EV/VB/243692227/tadajuv-d-t20-d60.webp",
+    },
+    {
+      id: 189,
+      title: "Tadajuv D Super  (T40/D60)",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "40/60",
+      composition: "Tadalafil(40) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 67.99,
+      description: "Tadajuv D Super",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/520304361/UQ/FW/LE/243692227/tadajuv-d-super-t40-d60.jpeg",
+    },
+    {
+      id: 190,
+      title: "Tastylia 2.5 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 2.5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 17.99,
+      description: "Tastylia 2.5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/415216659/EY/FB/DX/196347078/1-500x500.jpg",
+    },
+    {
+      id: 191,
+      title: "Tastylia 5 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 20.99,
+      description: "Tastylia 5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/435350326/HV/ZT/EZ/129230798/tastylia-5-mg-tablet-500x500.jpg",
+    },
+    {
+      id: 192,
+      title: "Tastylia 10 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 86.99,
+      description: "Tastylia 10mg tablets",
+      image:
+        "https://www.healingpharma.in/wp-content/uploads/2022/03/Tastylia-10-1.jpg",
+    },
+    {
+      id: 193,
+      title: "Tastylia 20 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 110.99,
+      description: "Tastylia 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/485393523/RR/VC/GB/190581385/tastylia-20-mg-tablet.jpg",
+    },
+    {
+      id: 194,
+      title: "Tastylia 40 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 31.99,
+      description: "Tastylia 40mg tablets",
+      image:
+        "https://www.healingpharma.in/wp-content/uploads/2022/11/Tastylia-40.jpg",
+    },
+    {
+      id: 195,
+      title: "Tastylia 60 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 36.99,
+      description: "Tastylia 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/484581541/HB/GA/IA/238301431/untitled-5.jpg",
+    },
+    {
+      id: 196,
+      title: "Tastylia 80 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 41.99,
+      description: "Tastylia 80mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/430893741/GT/LR/KZ/6796833/tastylia-80mg-tablets.jpg",
+    },
+    {
+      id: 197,
+      title: "Tastylia Black 80 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 43.99,
+      description: "Tastylia Black 80mg",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKBvZUJUdMjuosHMlQcymkaW2YCEHEi3IzUg&s",
+    },
+    {
+      id: 198,
+      title: "Tastylia Super Active Softgel 20 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Cap",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 31.99,
+      description: "Tastylia super active softgel",
+      image:
+        "https://5.imimg.com/data5/ANDROID/Default/2025/1/483454193/IC/AL/IU/142116055/product-jpeg-500x500.jpeg",
+    },
+    {
+      id: 199,
+      title: "Tastylia ODS 10 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 24.99,
+      description: "Tastylia ODS 10mg",
+      image:
+        "https://www.healingpharma.in/wp-content/uploads/2022/11/Tastylia-10-ODS_3D.jpg",
+    },
+    {
+      id: 200,
+      title: "  ",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 27.99,
+      description: "Tastylia ODS 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/451994657/MI/YB/ZW/226486661/img-0205.jpeg",
+    },
+    {
+      id: 201,
+      title: "Super Tastylia (T20/D60)",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Tadalafil(20) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 54.99,
+      description: "Super Tastylia combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/521599074/KV/OQ/EO/243692227/super-tastylia-t20-d60.jpeg",
+    },
+    {
+      id: 202,
+      title: "Tastylia Oral Jelly 20 Mg",
+      company: "Healing Pharma",
+      packing: "5GmX7Sach",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 41.99,
+      description: "Tastylia oral jelly",
+      image:
+        "https://www.healingpharma.in/wp-content/uploads/2022/11/Tastylia_Tadalafil-Oral-jelly.jpg",
+    },
+    {
+      id: 203,
+      title: "Abhirise 20 Mg",
+      company: "Abhiflex",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 130.99,
+      description: "Abhirise 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/4/407950592/IB/OO/SF/217134588/2-1-500x500.webp",
+    },
+    {
+      id: 204,
+      title: "Abhirise 40 Mg",
+      company: "Abhiflex",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 94.99,
+      description: "Abhirise 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/2/490589351/LF/SW/NR/68275745/6109419072950224825-1.jpeg",
+    },
+    {
+      id: 205,
+      title: "Abhirise 60 Mg",
+      company: "Abhiflex",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 94.99,
+      description: "Abhirise 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/423817194/LG/RA/BA/211621874/abhirise-60mg.jpeg",
+    },
+    {
+      id: 206,
+      title: "Abhirise 80 Mg",
+      company: "Abhiflex",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 94.99,
+      description: "Abhirise 80mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/10/354428346/JV/KE/LD/187621614/2-3.webp",
+    },
+    {
+      id: 207,
+      title: "Megalis 5 Mg",
+      company: "Mcleods",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 19.99,
+      description: "Megalis 5mg daily",
+      image:
+        "https://images.apollo247.in/pub/media/catalog/product/M/E/MEG0592_3.jpg",
+    },
+    {
+      id: 208,
+      title: "Megalis 10 Mg",
+      company: "Mcleods",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 167.99,
+      description: "Megalis 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/2/383142045/SE/YF/LD/181075725/megalis-10-mg-tadalafil-tablets.webp",
+    },
+    {
+      id: 209,
+      title: "Megalis 20 Mg",
+      company: "Mcleods",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 230.99,
+      description: "Megalis 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/9/346922536/YS/FC/VZ/149486981/megalis-20-mg-tablets-1-500x500.jpg",
+    },
+    {
+      id: 210,
+      title: "Megalis D (T10/D30)",
+      company: "Mcleods",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "10/30",
+      composition: "Tadalafil(10) Dapoxetine(30)",
+      category: "Tadalafil",
+      price: 43.99,
+      description: "Megalis D combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/515750084/DT/EY/OT/201329484/meg-1.webp",
+    },
+    {
+      id: 211,
+      title: "Tadagra 20 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 54.6,
+      description: "Tadagra 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/6/PU/JP/XG/153896819/tadagra-20-mg.jpg",
+    },
+    {
+      id: 212,
+      title: "Tadagra Strong 40 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 56.49,
+      description: "Tadagra Strong 40mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/434944089/VW/JE/BB/73196038/tadagra-strong-40-mg-tablet-500x500.jpg",
+    },
+    {
+      id: 213,
+      title: "Tadagra Super 60 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 155.49,
+      description: "Tadagra Super 60mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/507404193/ST/ER/NV/37869803/tadaga-super-tadalafil-tablets-500x500.png",
+    },
+    {
+      id: 214,
+      title: "Tadagra Power 80 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 38.49,
+      description: "Tadagra Power 80mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/481670171/CY/HD/AO/199520048/tadaga-power-80-mg.jpg",
+    },
+    {
+      id: 215,
+      title: "Tadagra Professional 20 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 26.99,
+      description: "Tadagra Professional 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/8/439894090/BD/AZ/OL/216654467/tadagra-20mg-tablet.png",
+    },
+    {
+      id: 216,
+      title: "Tadagra Soft 20 Mg Chewable",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 28.99,
+      description: "Tadagra soft chewable",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/3/494543661/MZ/US/XY/23579424/tadagra-soft-tadalafil-20mg-soft-chewable.png",
+    },
+    {
+      id: 217,
+      title: "Tadaga 5 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 18.99,
+      description: "Tadaga 5mg daily",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/511521327/FC/IC/IY/107248383/tadaga-5-mg-tablet.jpeg",
+    },
+    {
+      id: 218,
+      title: "Tadaga 10 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 21.99,
+      description: "Tadaga 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/6/316539040/XZ/XN/NJ/148743120/skyrbhf5q4kaip22julfjgiwlqowtdpu0fzm6t2n.jpeg",
+    },
+    {
+      id: 219,
+      title: "Tadaga 20 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 114.99,
+      description: "Tadaga 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/8/439889762/ER/MZ/KY/216654467/tadagra-20mg-tablet-500x500.png",
+    },
+    {
+      id: 220,
+      title: "Tadaga Strong 40 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 29.99,
+      description: "Tadaga Strong 40mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/434944089/VW/JE/BB/73196038/tadagra-strong-40-mg-tablet-500x500.jpg",
+    },
+    {
+      id: 221,
+      title: "Tadaga Super 60 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 155.99,
+      description: "Tadaga Super 60mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/448033934/LF/RN/TT/229364765/tadalafil-tadaga-super-60-mg-500x500.jpeg",
+    },
+    {
+      id: 222,
+      title: "Tadaga Power 80 Mg",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 39.99,
+      description: "Tadaga Power 80mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/481670171/CY/HD/AO/199520048/tadaga-power-80-mg.jpg",
+    },
+    {
+      id: 223,
+      title: "Tadaga Oral Jelly 20 Mg",
+      company: "RSM",
+      packing: "5GmX7Sach",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 40.99,
+      description: "Tadaga oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/474199051/KV/IA/FB/233631102/whatsapp-image-2024-12-19-at-9-29-44-am.jpeg",
+    },
+    {
+      id: 224,
+      title: "Efil 2.5 Mg",
+      company: "JB Chemicals",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 2.5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 45.49,
+      description: "Efil 2.5mg daily",
+      image:
+        "https://images.apollo247.in/pub/media/catalog/product/e/f/efi0032.jpg",
+    },
+    {
+      id: 225,
+      title: "Efil 5 Mg",
+      company: "JB Chemicals",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 22.49,
+      description: "Efil 5mg daily",
+      image:
+        "https://cdn.pixelbin.io/v2/plain-cake-860195/netmed/wrkr/products/assets/item/free/original/UAOXNftR-G-efil_5mg_tablet_10_s_0.jpg",
+    },
+    {
+      id: 226,
+      title: "Efil 10 Mg",
+      company: "JB Chemicals",
+      packing: "1X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 24.49,
+      description: "Efil 10mg tablets",
+      image:
+        "https://zeelabpharmacy.com/uploads/other_brand_image/Zee6773c7a99cbed.jpg",
+    },
+    {
+      id: 227,
+      title: "Efil 20 Mg",
+      company: "JB Chemicals",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 27.49,
+      description: "Efil 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/528016027/HV/GB/YW/159419808/efil-tadalafil-tablets.jpg",
+    },
+    {
+      id: 228,
+      title: "Tadora 20 Mg",
+      company: "German Remedies",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 107.99,
+      description: "Tadora 20mg",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNr9Jsa3aviZiAje2cCvpHLZKLsElIokO2Vw&s",
+    },
+    {
+      id: 229,
+      title: "Tadora Force (T20/D60)",
+      company: "German Remedies",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Tadalafil(20) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 54.99,
+      description: "Tadora Force combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/528490311/VL/NA/RJ/243692227/tadora-force-t20-d60.jpeg",
+    },
+    {
+      id: 230,
+      title: "Tadapox (T20/D60)",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Tadalafil(20) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 185.99,
+      description: "Tadapox combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/7/431718187/AH/QV/BL/211621874/tadapox-500x500.jpg",
+    },
+    {
+      id: 231,
+      title: "Super Tadapox (T40/D60)",
+      company: "RSM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "40/60",
+      composition: "Tadalafil(40) Dapoxetine(60)",
+      category: "Tadalafil",
+      price: 65.99,
+      description: "Super Tadapox",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/451003937/VH/RG/TB/6796833/super-tadapox-1.jpg",
+    },
+    {
+      id: 232,
+      title: "Uphold (T10/D30)",
+      company: "Fourrts",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "10/30",
+      composition: "Tadalafil(10) Dapoxetine(30)",
+      category: "Tadalafil",
+      price: 220.99,
+      description: "Uphold combination",
+      image:
+        "https://www.adorefem.com/wp-content/uploads/2018/06/MALEBLISS-1-scaled.jpg",
+    },
+    {
+      id: 233,
+      title: "Cialis 10 Mg",
+      company: "Lilly",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 159.99,
+      description: "Original Cialis 10mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/3/WN/YN/GP/25738186/cialis-tadalafil-10-mg.jpeg",
+    },
+    {
+      id: 234,
+      title: "Cialis 20 Mg",
+      company: "Lilly",
+      packing: "1X5 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 239.99,
+      description: "Original Cialis 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/6/428094414/NC/YI/ZC/114291956/cialis-tadalafil-20mg-tablets.jpg",
+    },
+    {
+      id: 235,
+      title: "Modula 5 Mg",
+      company: "Sunpharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 5,
+      composition: "Tadalafil",
+      category: "Tadalafil",
+      price: 65.99,
+      description: "Modula 5mg",
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdj1VgFkKBCq0glqrdtMyqFv9ec48ZmnnFoQ&s",
+    },
+    {
+      id: 236,
+      title: "Vilitra 10 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 111.99,
+      description: "Vilitra 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/4/302564843/YU/IP/MT/99449851/vilitra-10-mg.webp",
+    },
+    {
+      id: 237,
+      title: "Vilitra 20 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 130.99,
+      description: "Vilitra 20mg tablets",
+      image:
+        "https://img500.exportersindia.com/product_images/bc-500/2023/4/8026423/vilitra-20-mg-1682318254-6863484.jpeg",
+    },
+    {
+      id: 238,
+      title: "Vilitra 40 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 155.99,
+      description: "Vilitra 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/470771921/QZ/QY/JI/181363519/whatsapp-image-2024-12-06-at-9-19-30-am.jpeg",
+    },
+    {
+      id: 239,
+      title: "Vilitra 60 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 179.99,
+      description: "Vilitra 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/464885090/SK/NT/BS/113189343/vilitra-60-mg.jpeg",
+    },
+    {
+      id: 240,
+      title: "Vilitra 80 Mg",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 43.99,
+      description: "Vilitra 80mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/415772957/WS/AL/UC/4794823/vilitra-80mg-vardenafil-tablets.jpg",
+    },
+    {
+      id: 241,
+      title: "Super Vilitra (V20/D60)",
+      company: "Centurion",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Vardenafil(20) Dapoxetine(60)",
+      category: "Vardenafil",
+      price: 59.99,
+      description: "Super Vilitra combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/11/XV/CE/RW/134881373/super-vilitra-tablets-500x500.jpg",
+    },
+    {
+      id: 242,
+      title: "Varna 20 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 24.99,
+      description: "Varna 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/502404649/TX/GM/FK/222240752/varna-20-mg-vardenafil-tablets.jpg",
+    },
+    {
+      id: 243,
+      title: "Varna 40 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 29.99,
+      description: "Varna 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/ANDROID/Default/2022/9/DZ/QF/MC/154492060/product-jpeg-250x250.jpg",
+    },
+    {
+      id: 244,
+      title: "Varna 60 Mg",
+      company: "Jeerima",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 34.99,
+      description: "Varna 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/8/334718197/PV/IX/BI/193900896/varna-60-mg-tablets.jpg",
+    },
+    {
+      id: 245,
+      title: "Valif 10 Mg",
+      company: "Ajanta",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 90.49,
+      description: "Valif 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/479159987/DA/PO/EP/238301431/untitled-2-500x500.jpg",
+    },
+    {
+      id: 246,
+      title: "Valif 20 Mg",
+      company: "Ajanta",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 117.49,
+      description: "Valif 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/415425563/KR/HO/UC/115003177/vardenafil-valif-20-mg-tablets.jpeg",
+    },
+    {
+      id: 247,
+      title: "Valif Oral Jelly 20 Mg",
+      company: "Ajanta",
+      packing: "5GmX7Sach",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 40.99,
+      description: "Valif oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/TC/QM/UO/131692438/valif-oral-jelly.jpeg",
+    },
+    {
+      id: 248,
+      title: "Zhewitra 10 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 60.49,
+      description: "Zhewitra 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/1/QH/GW/HP/942830/zhewitra-10mg.jpg",
+    },
+    {
+      id: 249,
+      title: "Zhewitra 20 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 81.49,
+      description: "Zhewitra 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/1/CE/WA/UG/942830/zhewitra-20mg.jpg",
+    },
+    {
+      id: 250,
+      title: "Zhewitra 40 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 190.49,
+      description: "Zhewitra 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/9/543689457/WW/XD/ZI/59616023/zhewitra-40mg-tablets.jpg",
+    },
+    {
+      id: 251,
+      title: "Zhewitra 60 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 93.49,
+      description: "Zhewitra 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/451739392/PM/OY/ZB/224412585/zhewitra-vardenafil-60-mg.jpg",
+    },
+    {
+      id: 252,
+      title: "Zhewitra Soft Chewable 20 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 30.49,
+      description: "Zhewitra soft chewable",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/2/490358686/XT/GW/NJ/203764836/20mg-zhewitra-soft-tablets.jpg",
+    },
+    {
+      id: 253,
+      title: "Super Zhewitra (V20/D60)",
+      company: "Sunrise",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Vardenafil(20) Dapoxetine(60)",
+      category: "Vardenafil",
+      price: 56.99,
+      description: "Super Zhewitra combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/479161010/PW/IB/UN/238301431/untitled.jpg",
+    },
+    {
+      id: 254,
+      title: "Extra Super Zhewitra (V40/D60)",
+      company: "Sunrise",
+      packing: "1X4 Tablets",
+      packagingType: "Box",
+      mg: "40/60",
+      composition: "Vardenafil(40) Dapoxetine(60)",
+      category: "Vardenafil",
+      price: 69.99,
+      description: "Extra Super Zhewitra",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/5/508541727/HA/WN/DR/154726424/extra-super-zhewitra-tablets-500x500.jpg",
+    },
+    {
+      id: 255,
+      title: "Zhewitra Oral Jelly 20 Mg",
+      company: "Sunrise",
+      packing: "5GmX7Sach",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 41.99,
+      description: "Zhewitra oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/6/518305866/MM/HD/QL/12324131/zhewitra-oral-jelly.jpeg",
+    },
+    {
+      id: 256,
+      title: "Filitra 10 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 24.99,
+      description: "Filitra 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/8/337237598/HT/LM/NF/59547857/filitra-10-mg-tablets.jpeg",
+    },
+    {
+      id: 257,
+      title: "Filitra 20 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 27.49,
+      description: "Filitra 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/SI/ZQ/AQ/131692438/filitra-20-mg-tablet-500x500.jpeg",
+    },
+    {
+      id: 258,
+      title: "Filitra 40 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 32.49,
+      description: "Filitra 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/483789223/HB/FB/UI/93935497/filitra-40-vardenafil-tablets-500x500.jpg",
+    },
+    {
+      id: 259,
+      title: "Filitra Professional 20 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 29.99,
+      description: "Filitra Professional 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/1/378222772/HP/XQ/KC/148077540/img-20240111-170452-250x250.jpg",
+    },
+    {
+      id: 260,
+      title: "Vardejuv 10 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 23.99,
+      description: "Vardejuv 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/3/EG/TV/GW/25738186/vardejuv-10mg.jpeg",
+    },
+    {
+      id: 261,
+      title: "Vardejuv 20 Mg",
+      company: "Juvenor",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 26.49,
+      description: "Vardejuv 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/7/322066270/EB/RF/HS/61269834/rifaximin-tablets.jpg",
+    },
+    {
+      id: 262,
+      title: "Varditra 10 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 10,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 23.49,
+      description: "Varditra 10mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/503050412/ZN/AK/XX/10526113/vardenafil-tablets-varditra.jpeg",
+    },
+    {
+      id: 263,
+      title: "Varditra 20 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 25.99,
+      description: "Varditra 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/5/308233264/HD/WL/CT/185952854/varditra-20-tablets.jpg",
+    },
+    {
+      id: 264,
+      title: "Varditra 40 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 30.99,
+      description: "Varditra 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/1/380347088/HG/NQ/VG/29488980/40-1-500x500.jpg",
+    },
+    {
+      id: 265,
+      title: "Varditra 60 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 35.99,
+      description: "Varditra 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/5/308233264/HD/WL/CT/185952854/varditra-20-tablets.jpg",
+    },
+    {
+      id: 266,
+      title: "Super Varditra (V20/D60)",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Vardenafil(20) Depoxetine(60)",
+      category: "Vardenafil",
+      price: 55.99,
+      description: "Super Varditra combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/6/313284883/SE/ND/FP/185952854/varditra-20-tablets-500x500.jpg",
+    },
+    {
+      id: 267,
+      title: "Snovitra 20 Mg",
+      company: "",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 56.99,
+      description: "Snovitra 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/416401500/PF/ZE/BV/217405689/20-mg-snovitra-tablets.jpg",
+    },
+    {
+      id: 268,
+      title: "Snovitra Strong 40 Mg",
+      company: "",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 81.99,
+      description: "Snovitra Strong 40mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/3/NT/EE/UV/15940005/snovitra-tablets-40-mg-hd.png",
+    },
+    {
+      id: 269,
+      title: "Snovitra XL 60 Mg",
+      company: "",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 34.99,
+      description: "Snovitra XL 60mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/461760888/UM/ER/VP/141877775/snovitra-xl.jpeg",
+    },
+    {
+      id: 270,
+      title: "Snovitra Soft Chewable 20 Mg",
+      company: "",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 28.99,
+      description: "Snovitra soft chewable",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/3/494542408/HB/HE/AW/23579424/snovitra-soft-chewable-vardenafil-20mg.jpeg",
+    },
+    {
+      id: 271,
+      title: "Snovitra Professional 20 Mg",
+      company: "",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 149.99,
+      description: "Snovitra Professional 20mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/478229258/EG/NF/LA/38661186/snovitra-20mg-tablet.jpeg",
+    },
+    {
+      id: 272,
+      title: "Snovitra Super Power (V20/D60)",
+      company: "",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "20/60",
+      composition: "Vardenafil(20) Dapoxetine(60)",
+      category: "Vardenafil",
+      price: 54.99,
+      description: "Snovitra Super Power",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/1/484794188/KV/SZ/WW/93935497/snovitra-super-power-tablet.jpg",
+    },
+    {
+      id: 273,
+      title: "Levifil 20 Mg",
+      company: "Ambitree",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 25.49,
+      description: "Levifil 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/11/466359084/QC/SG/HR/225525211/levifil-20-mg.jpg",
+    },
+    {
+      id: 274,
+      title: "Levifil Power (V20/D60)",
+      company: "Ambitree",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Vardenafil(20) Dapoxetine(60)",
+      category: "Vardenafil",
+      price: 55.99,
+      description: "Levifil Power combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/12/476617130/SR/VC/RC/235096717/super-zhewitra-vardenafil-dapoxe.png",
+    },
+    {
+      id: 275,
+      title: "Levifil Super Power (V40/D60)",
+      company: "Ambitree",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Vardenafil(40) Dapoxetine(60)",
+      category: "Vardenafil",
+      price: 68.99,
+      description: "Levifil Super Power",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/9/453429018/FZ/XO/AZ/6796833/e0d96c46-4860-4464-816a-9b984396067b.jpeg",
+    },
+    {
+      id: 276,
+      title: "Extreme Levifil Power (V20/D100)",
+      company: "Ambitree",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 120,
+      composition: "Vardenafil(20) Dapoxetine(100)",
+      category: "Vardenafil",
+      price: 78.99,
+      description: "Extreme Levifil Power",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/3/403041739/YC/YB/MW/146201131/extreme-levifil-power.jpg",
+    },
+    {
+      id: 277,
+      title: "Extreme Levifil Super Power (V40/D100)",
+      company: "Ambitree",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 140,
+      composition: "Vardenafil(40) Dapoxetine(100)",
+      category: "Vardenafil",
+      price: 91.99,
+      description: "Extreme Levifil Super Power",
+      image:
+        "https://5.imimg.com/data5/ANDROID/Default/2024/1/375311748/NK/UN/NA/47676896/product-jpeg.jpg",
+    },
+    {
+      id: 278,
+      title: "Vitara V 20 Mg",
+      company: "Signature",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 24.99,
+      description: "Vitara V 20mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/1/IB/II/QH/138077249/vitara-v-20-mg-hd-500x500.jpeg",
+    },
+    {
+      id: 279,
+      title: "Vitara V 40 Mg",
+      company: "Signature",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 40,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 151.99,
+      description: "Vitara V 40mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/8/533000673/IR/XT/VZ/12931111/vitara-v-40mg-tablets.jpg",
+    },
+    {
+      id: 280,
+      title: "Vitara V 60 Mg",
+      company: "Signature",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 161.99,
+      description: "Vitara V 60mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/501242089/ZN/ZX/EC/242737357/vitara-v-60mg-tablets.jpg",
+    },
+    {
+      id: 281,
+      title: "Vitara V Oral Jelly 20 Mg",
+      company: "Signature",
+      packing: "5GmX7Sach",
+      packagingType: "Box",
+      mg: 20,
+      composition: "Vardenafil",
+      category: "Vardenafil",
+      price: 39.99,
+      description: "Vitara V oral jelly",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/9/BA/XV/HD/4794823/finasteride-tablet-1-mg.jpg",
+    },
+    {
+      id: 282,
+      title: "Extra Super Vardalast (V40/D100)",
+      company: "NJM",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "40/100",
+      composition: "Vardenafil(40) Dapoxetine(100)",
+      category: "Vardenafil",
+      price: 89.99,
+      description: "Extra Super Vardalast",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/462523163/FP/MC/HD/6796833/extra-super-vardalast.png",
+    },
+    {
+      id: 283,
+      title: "Vidofil Super Power",
+      company: "Ether Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: "40/100",
+      composition: "Vardenafil(40) Dapoxetine(100)",
+      category: "Vardenafil",
+      price: 88.99,
+      description: "Vidofil Super Power",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/420274983/AE/MX/WS/191211056/vidofil-super-power.jpg",
+    },
+    {
+      id: 284,
+      title: "Avana 50 Mg",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 50,
+      composition: "Avanafil",
+      category: "Avanafil",
+      price: 43.99,
+      description: "Avana 50mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/4/302912093/SC/JQ/SN/187315420/new-product.webp",
+    },
+    {
+      id: 285,
+      title: "Avana 100 Mg",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Avanafil",
+      category: "Avanafil",
+      price: 150.99,
+      description: "Avana 100mg tablets",
+      image:
+        "https://img500.exportersindia.com/product_images/bc-500/2023/4/10276863/avana-100-tablets-1681110476-6841945.jpeg",
+    },
+    {
+      id: 286,
+      title: "Avana 200 Mg",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Avanafil",
+      category: "Avanafil",
+      price: 390.99,
+      description: "Avana 200mg tablets",
+      image:
+        "https://cmedia.cheapmedicineshop.com/media/catalog/product/cache/3ece73ba11197967e54f8a0f57c00f4b/a/v/avana_200_mg_with_avanafil.jpeg.webp",
+    },
+    {
+      id: 287,
+      title: "Top Avana (A50/D60)",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 80,
+      composition: "Avanafil(50) Dapoxetine(30)",
+      category: "Avanafil",
+      price: 69.99,
+      description: "Top Avana combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/416582818/FJ/KS/DE/146201131/top-avana.jpg",
+    },
+    {
+      id: 288,
+      title: "Super Avana (A100/D60)",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 160,
+      composition: "Avanafil(100) Dapoxetine(60)",
+      category: "Avanafil",
+      price: 82.99,
+      description: "Super Avana combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/1/YC/PJ/GC/942830/super-avana.jpg",
+    },
+    {
+      id: 289,
+      title: "Extra Super Avana (A200/D60)",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 260,
+      composition: "Avanafil(200) Dapoxetine(60)",
+      category: "Avanafil",
+      price: 102.99,
+      description: "Extra Super Avana",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/9/343406209/PM/NT/WX/161423711/extra-super-avana-tablet.jpg",
+    },
+    {
+      id: 290,
+      title: "Avanair 100 Mg",
+      company: "Cipla",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Avanafil",
+      category: "Avanafil",
+      price: 196.99,
+      description: "Avanair 100mg by Cipla",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/7/524016814/BG/UO/HB/4092588/vinafinil-tablets.jpg",
+    },
+    {
+      id: 291,
+      title: "Avanair 200 Mg",
+      company: "Cipla",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Avanafil",
+      category: "Avanafil",
+      price: 337.99,
+      description: "Avanair 200mg by Cipla",
+      image:
+        "https://cdn.pixelbin.io/v2/plain-cake-860195/netmed/wrkr/products/assets/item/free/original/E9bAT66TaQ-avanair_200_tablet_4s_413878_0_0.jpg",
+    },
+    {
+      id: 292,
+      title: "Super Zudena (U100/D60)",
+      company: "Sunrise",
+      packing: "1x5 Tablets",
+      packagingType: "Box",
+      mg: "100/60",
+      composition: "Udenafil",
+      category: "Udenafil",
+      price: 76.99,
+      description: "Super Zudena combination",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2025/4/505689320/ZK/UV/LT/242319812/super-zudena-udenafil-100mg-dapoxitene-60mg-500x500.webp",
+    },
+    {
+      id: 293,
+      title: "Zudena 100 Mg",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 100,
+      composition: "Udenafil",
+      category: "Udenafil",
+      price: 422.99,
+      description: "Zudena 100mg tablets",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/QG/CL/WT/131692438/zudena-100-mg-tablet.jpeg",
+    },
+    {
+      id: 294,
+      title: "Zudena 200 Mg",
+      company: "Sunrise",
+      packing: "1x4 Tablets",
+      packagingType: "Box",
+      mg: 200,
+      composition: "Udenafil",
+      category: "Udenafil",
+      price: 69.99,
+      description: "Zudena 200mg tablets",
+      image:
+        "https://jindalmedicalstore.in/wp-content/uploads/2021/02/1-10.jpg",
+    },
+    {
+      id: 295,
+      title: "Poxet 30 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 30,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 421.99,
+      description: "Poxet 30mg for premature ejaculation",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/3/403185379/VQ/OU/ZV/39084219/poxet-30mg-tablet-500x500.jpeg",
+    },
+    {
+      id: 296,
+      title: "Poxet 60 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 399.0,
+      description: "Poxet 60mg for premature ejaculation",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/7/327819108/CM/UT/TD/191231987/poxet-60-mg-tablets.jpg",
+    },
+    {
+      id: 297,
+      title: "Poxet 90 Mg",
+      company: "Sunrise",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 90,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 492.99,
+      description: "Poxet 90mg for premature ejaculation",
+      image:
+        "https://img3.exportersindia.com/product_images/bc-full/dir_116/3474037/poxet-90-mg-1502977613-3227578.jpeg",
+    },
+    {
+      id: 298,
+      title: "Depoforce 30 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 30,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 23.99,
+      description: "Depoforce 30mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2023/10/353118885/BR/HD/AI/14929812/dapoforce-30.jpg",
+    },
+    {
+      id: 299,
+      title: "Depoforce 60 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 28.99,
+      description: "Depoforce 60mg",
+      image:
+        "https://5.imimg.com/data5/ANDROID/Default/2023/5/307806950/BG/QU/JY/47676896/product-jpeg-500x500.jpg",
+    },
+    {
+      id: 300,
+      title: "Depoforce 90 Mg",
+      company: "Healing Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 90,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 35.99,
+      description: "Depoforce 90mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/4/407593366/EJ/EC/MC/30685956/dapoforce-90-tablets.jpg",
+    },
+    {
+      id: 301,
+      title: "Duratia 30 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 30,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 80.49,
+      description: "Duratia 30mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/10/461746208/UB/QB/RO/231980812/duratia-30-mg-tablets-500x500.jpg",
+    },
+    {
+      id: 302,
+      title: "Duratia 60 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 60,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 89.49,
+      description: "Duratia 60mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/3/401879983/QZ/KG/JZ/211621874/duratia-60-mg-dapoxetine-tablets.jpg",
+    },
+    {
+      id: 303,
+      title: "Duratia 90 Mg",
+      company: "Fortune",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 90,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 102.99,
+      description: "Duratia 90mg",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2021/6/CG/DR/QB/131692438/duratia-90.jpeg",
+    },
+    {
+      id: 304,
+      title: "Duralast 30 Mg",
+      company: "Sun Pharma",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 30,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 138.99,
+      description: "Duralast 30mg",
+      image:
+        "https://cdn.netmeds.tech/v2/plain-cake-860195/netmed/wrkr/products/assets/item/free/resize-w:400/cgTPd5TkoP-duralast_30mg_tablet_4s_35015_0_1.jpg",
+    },
+    {
+      id: 305,
+      title: "EJ 30 Mg",
+      company: "Delvin",
+      packing: "10X10 Tablets",
+      packagingType: "Box",
+      mg: 30,
+      composition: "Dapoxetine",
+      category: "Dapoxetine",
+      price: 24.99,
+      description: "EJ 30mg",
+      image:
+        "https://zeelabpharmacy.com/uploads/other_brand_image/Zee677bd951623ce.webp",
+    },
+    {
+      id: 306,
+      title: "Ashwagandha Extract Capsules",
+      description:
+        "Pure Ashwagandha extract capsules for stress relief, energy boost and hormonal balance. Made from authentic Withania somnifera roots.",
+      price: 24.99,
+      mg: 500,
+      category: "Single Herb Supplements",
+      composition: "Pure Ashwagandha (Withania somnifera) root extract",
+      packing: "60 capsules per bottle",
+      packagingType: "Box",
+      company: "Organic India",
+      image:
+        "https://m.media-amazon.com/images/I/61hOLbgPUKL._UF1000,1000_QL80_.jpg",
+    },
+    {
+      id: 307,
+      title: "Shilajit Resin",
+      description:
+        "Premium quality Shilajit resin sourced from Himalayas. Rich in fulvic acid and minerals for enhanced energy and vitality.",
+      price: 34.99,
+      mg: 0,
+      category: "Single Herb Supplements",
+      composition: "100% Pure Shilajit Resin",
+      packing: "50g resin jar",
+      packagingType: "Box",
+      company: "Himalayan Origins",
+      image:
+        "https://cdn.kindlife.in/images/detailed/123/00-Shilajit-Resin-Nirvasa-Mockup.jpg?t=1692437136",
+    },
+    {
+      id: 308,
+      title: "Shilajit Capsules",
+      description:
+        "Convenient Shilajit capsules with pure Shilajit extract. Easy to consume while maintaining all natural benefits.",
+      price: 29.99,
+      mg: 500,
+      category: "Single Herb Supplements",
+      composition: "Shilajit extract, Vegetarian capsule",
+      packing: "60 capsules",
+      packagingType: "Box",
+      company: "Himalayan Origins",
+      image:
+        "https://m.media-amazon.com/images/I/51SgyYWz6AL._UF1000,1000_QL80_.jpg",
+    },
+    {
+      id: 309,
+      title: "Safed Musli Powder",
+      description:
+        "Organic Safed Musli powder known for its strength and vitality enhancing properties. Traditional Ayurvedic herb.",
+      price: 19.99,
+      mg: 0,
+      category: "Single Herb Supplements",
+      composition: "100% Pure Chlorophytum borivilianum powder",
+      packing: "100g powder pouch",
+      packagingType: "Box",
+      company: "Baidyanath",
+      image:
+        "https://krishnaayurved.com/cdn/shop/products/Safed_1.jpg?v=1701497571",
+    },
+    {
+      id: 310,
+      title: "Safed Musli Capsules",
+      description:
+        "Standardized Safed Musli capsules for reproductive health and overall strength. Easy dosage and consumption.",
+      price: 18.99,
+      mg: 450,
+      category: "Single Herb Supplements",
+      composition: "Safed Musli extract, Vegetarian capsule",
+      packing: "60 capsules",
+      packagingType: "Box",
+      company: "Baidyanath",
+      image:
+        "https://swadesii.com/cdn/shop/products/SafedMusliCapsules.jpg?v=1696642963",
+    },
+    {
+      id: 311,
+      title: "Kaunch Beej (Mucuna Pruriens)",
+      description:
+        "Natural L-Dopa source from Mucuna Pruriens for dopamine support, mood enhancement and libido boost.",
+      price: 16.99,
+      mg: 0,
+      category: "Single Herb Supplements",
+      composition: "Pure Mucuna pruriens seed powder",
+      packing: "200g powder",
+      packagingType: "Box",
+      company: "Organic India",
+      image:
+        "https://bixabotanical.in/cdn/shop/files/KaunchBeej1_43762efe-2cff-47ce-bb1f-7dc0682d364a_grande.jpg?v=1689060402",
+    },
+    {
+      id: 312,
+      title: "Gokshura (Tribulus Terrestris)",
+      description:
+        "Gokshura powder for testosterone support, urinary health and physical strength. Traditional Ayurvedic herb.",
+      price: 14.99,
+      mg: 0,
+      category: "Single Herb Supplements",
+      composition: "100% Tribulus terrestris fruit powder",
+      packing: "150g powder",
+      packagingType: "Box",
+      company: "Dabur",
+      image: "https://m.media-amazon.com/images/I/71YA1f6zdWL.jpg",
+    },
+    {
+      id: 313,
+      title: "Tongkat Ali (Longjack) Extract",
+      description:
+        "Premium Tongkat Ali extract for energy, performance and hormonal balance. Sourced from Malaysia.",
+      price: 32.99,
+      mg: 400,
+      category: "Single Herb Supplements",
+      composition: "Tongkat Ali root extract 100:1",
+      packing: "60 capsules",
+      packagingType: "Box",
+      company: "Nature's Way",
+      image:
+        "https://content.jdmagicbox.com/quickquotes/images_main/tongkat-ali-extract-capsules-500mg-802113102-e4dkp4nn.jpg?impolicy=queryparam&im=Resize=(360,360),aspect=fit",
+    },
+    {
+      id: 314,
+      title: "Maca Root Extract",
+      description:
+        "Organic Maca Root extract from Peru for stamina, hormonal balance and natural energy enhancement.",
+      price: 27.99,
+      mg: 500,
+      category: "Single Herb Supplements",
+      composition: "Pure Lepidium meyenii root extract",
+      packing: "90 capsules",
+      packagingType: "Box",
+      company: "Navitas Organics",
+      image:
+        "https://m.media-amazon.com/images/I/71AeTPt0dwL._UF1000,1000_QL80_.jpg",
+    },
+    {
+      id: 315,
+      title: "Himalaya Tentex Forte",
+      description:
+        "Ayurvedic formulation for performance enhancement and reproductive health. Clinically tested.",
+      price: 14.99,
+      mg: 0,
+      category: "Multi-Herb Formulas",
+      composition: "Ashwagandha, Safed Musli, Gokshura, Kapikachhu, Vidarikand",
+      packing: "60 tablets",
+      packagingType: "Box",
+      company: "Himalaya Wellness",
+      image:
+        "https://gitaayurvedic.com/cdn/shop/files/himalaya-tentex-forte-10-tablets-and-rxtime-extra-30-tablets-combo-pack-444187_600x600_crop_center.png?v=1738425357",
+    },
+    {
+      id: 316,
+      title: "Dabur Shilajit Gold",
+      description:
+        "Premium Shilajit formulation with gold bhasma. Enhanced potency for energy and vitality.",
+      price: 24.99,
+      mg: 0,
+      category: "Multi-Herb Formulas",
+      composition: "Shilajit, Swarna Bhasma, Ashwagandha, Amalaki",
+      packing: "60 capsules",
+      packagingType: "Box",
+      company: "Dabur",
+      image:
+        "https://g.sdlcdn.com/imgs/l/b/1/unnamed-d44c6.png?trim=10&w=850&h=995&sharp=7",
+    },
+    {
+      id: 317,
+      title: "Baidyanath Vita Ex Gold",
+      description:
+        "Classical Ayurvedic formulation for male vitality and performance. Trusted brand since 1917.",
+      price: 17.99,
+      mg: 0,
+      category: "Multi-Herb Formulas",
+      composition: "Ashwagandha, Musli, Gokshura, Shilajit, Makardhwaj",
+      packing: "40 tablets",
+      packagingType: "Box",
+      company: "Baidyanath",
+      image:
+        "https://www.baidyanathayurved.com/cdn/shop/products/SBAB-VITAEXPLUS-20CP-1Pack_1.jpg?v=1636637541",
+    },
+    {
+      id: 318,
+      title: "Himcolin Gel",
+      description:
+        "Ayurvedic topical gel for performance support and blood circulation. Easy application.",
+      price: 12.99,
+      mg: 0,
+      category: "Multi-Herb Formulas",
+      composition: "Sudh Shilajit, Laksha, Kapoor, Madhurika",
+      packing: "50g tube",
+      packagingType: "Box",
+      company: "Himalaya Wellness",
+      image:
+        "https://gitaayurvedic.com/cdn/shop/files/himalaya-himcolin-gel-30g-and-rxtime-extra-30tablet-combo-pack-856563.jpg?v=1722406325",
+    },
+    {
+      id: 319,
+      title: "Manmath Ras",
+      description:
+        "Classical Ayurvedic Rasayana for vitality and reproductive health. Traditional formulation.",
+      price: 22.99,
+      mg: 0,
+      category: "Multi-Herb Formulas",
+      composition: "Swarna Bhasma, Rajata Bhasma, Loha Bhasma, Abhrak Bhasma",
+      packing: "10g bottle",
+      packagingType: "Box",
+      company: "Baidyanath",
+      image: "https://www.baidyanath.co.in/images/limg/63358439_i1_.jpg",
+    },
+    {
+      id: 320,
+      title: "Chyawanprash (Premium Herbal Tonic)",
+      description:
+        "Traditional Ayurvedic herbal jam for immunity, energy and overall health. Amla based formulation.",
+      price: 16.99,
+      mg: 0,
+      category: "Multi-Herb Formulas",
+      composition: "Amla, Ashwagandha, Shatavari, Gokshura, 38+ herbs",
+      packing: "500g jar",
+      packagingType: "Box",
+      company: "Dabur",
+      image:
+        "https://assets.myntassets.com/w_412,q_30,dpr_3,fl_progressive,f_webp/assets/images/30030432/2024/6/24/4a419419-01bb-4be7-84d3-f8cbd667370a1719238486599ImmunityBoosters1.jpg",
+    },
+    {
+      id: 321,
+      title: "Ayurvedic Vitality Combo Pack",
+      description:
+        "Complete vitality combo with Ashwagandha, Shilajit and Safed Musli for overall wellness.",
+      price: 69.99,
+      mg: 0,
+      category: "Supplement Combos",
+      composition: "Ashwagandha capsules, Shilajit resin, Safed Musli powder",
+      packing: "3-product bundle",
+      packagingType: "Box",
+      company: "Ayurveda Essentials",
+      image:
+        "https://www.shrichyawanayurved.com/cdn/shop/files/Ayurvedicmedicineformensenergy_500x.webp?v=1695200855",
+    },
+    {
+      id: 322,
+      title: "Herbal Performance Kit",
+      description:
+        "Specialized kit with Mucuna, Tribulus and Tongkat Ali for performance enhancement and stamina.",
+      price: 59.99,
+      mg: 0,
+      category: "Supplement Combos",
+      composition: "Mucuna capsules, Tribulus capsules, Tongkat Ali capsules",
+      packing: "3-product bundle",
+      packagingType: "Box",
+      company: "Herbal Solutions",
+      image:
+        "https://res.cloudinary.com/dql8xbmqj/image/upload/v1749016889/hbzdauy4i9y1yl5ao9zw.jpg",
+    },
+    {
+      id: 323,
+      title: "Organic Wellness Booster Pack",
+      description:
+        "Organic wellness package with Maca Root, Ashwagandha and herbal blends for natural balance.",
+      price: 49.99,
+      mg: 0,
+      category: "Supplement Combos",
+      composition: "Maca Root capsules, Ashwagandha powder, Herbal tea blend",
+      packing: "Complete wellness kit",
+      packagingType: "Box",
+      company: "Organic Harvest",
+      image: "https://m.media-amazon.com/images/I/61ILXQ9ywYL.jpg",
+    },
+    {
+      id: 324,
+      title: "Herbal Massage Oil Range",
+      description:
+        "Therapeutic herbal massage oils for relaxation, circulation and overall wellbeing.",
+      price: 19.99,
+      mg: 0,
+      category: "Supplement Combos",
+      composition: "Sesame oil, Ashwagandha, Bala, Dashmool herbs",
+      packing: "100ml bottle",
+      packagingType: "Box",
+      company: "Ayurveda Concepts",
+      image: "https://m.media-amazon.com/images/I/71Q-cttr8qL.jpg",
+    },
+    {
+      id: 325,
+      title: "Natural Performance Boosters",
+      description:
+        "Herbal supplements specifically formulated for enhanced physical and athletic performance.",
+      price: 34.99,
+      mg: 0,
+      category: "Specialized Products",
+      composition: "Tribulus, Ashwagandha, Safed Musli, Gokshura",
+      packing: "90 capsules",
+      packagingType: "Box",
+      company: "Sports Ayurveda",
+      image:
+        "https://purenutrition.in/cdn/shop/files/Nitricoxidebooster60tab_5.png?v=1743137477",
+    },
+    {
+      id: 326,
+      title: "Ayurvedic ED Support",
+      description:
+        "Traditional Ayurvedic solutions for erectile dysfunction with natural herbs and minerals.",
+      price: 29.99,
+      mg: 0,
+      category: "Specialized Products",
+      composition: "Shilajit, Kaunch Beej, Ashwagandha, Gokshura",
+      packing: "60 tablets",
+      packagingType: "Box",
+      company: "Ayurveda Specialists",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2022/8/FG/PW/GM/86386737/kaamocare-g1-3-combo-250x250.jpg",
+    },
+    {
+      id: 327,
+      title: "Herbal Alternatives to Viagra",
+      description:
+        "Natural herbal formulations as safe alternatives to pharmaceutical options for performance enhancement.",
+      price: 26.99,
+      mg: 0,
+      category: "Specialized Products",
+      composition: "Mucuna, Tribulus, Ashwagandha, Shilajit",
+      packing: "75 capsules",
+      packagingType: "Box",
+      company: "Natural Remedies",
+      image:
+        "https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2023/09/3_Mason-Natural-Korean-Ginseng_Without_BG-1.png",
+    },
+    {
+      id: 328,
+      title: "Men's Wellness & Vitality",
+      description:
+        "Comprehensive range for men's overall health, vitality and hormonal balance with traditional herbs.",
+      price: 39.99,
+      mg: 0,
+      category: "Specialized Products",
+      composition: "Ashwagandha, Shilajit, Safed Musli, Gokshura, Mucuna",
+      packing: "120 capsules",
+      packagingType: "Box",
+      company: "Men's Health Ayurveda",
+      image:
+        "https://5.imimg.com/data5/SELLER/Default/2024/5/423284486/MT/RK/QT/6747283/guapha-ayurveda-men-s-wellness-60-tablets-for-vigour-vitality-500x500.jpg",
+    },
+    {
+      id: "KAP-SHJLT-50",
+      title: "Kapiva Shilajit",
+      image:
+        "https://m.media-amazon.com/images/I/71e48eVP9ZL._UF1000,1000_QL80_.jpg",
+      price: 899.0,
+      description:
+        "Kapiva Shilajit Gold Resin is a potent and pure Ayurvedic herb, sourced directly from the Himalayas. This natural supplement is renowned for boosting energy, enhancing physical performance, and supporting overall vitality. It helps combat fatigue, improves stamina, and promotes a healthy immune system. The resin form ensures high potency and easy absorption by the body.",
+      composition:
+        "Purified Shilajit Resin (Asphaltum). 100% Pure and Natural. Free from fillers, artificial colours, and preservatives.",
+      packing: "50 grams",
+      category: "Kapiva Shilajit",
+      packagingType: "Box",
+      company: "Kapiva",
+      mg: 0,
+    },
+  ];
+
+  // Use passed products or sample products
+  const displayProducts = products.length > 0 ? products : sampleProducts;
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const slideInterval = useRef(null);
+  const { addToCart } = useCart();
+
+  // Auto slide every 3 seconds
+  const autoSlideDuration = 3000;
+
+  // Responsive slides per view
+  const getSlidesPerView = () => {
+    if (window.innerWidth >= 1024) return 4; // Desktop
+    if (window.innerWidth >= 768) return 3; // Tablet
+    if (window.innerWidth >= 640) return 2; // Mobile landscape
+    return 1; // Mobile portrait
+  };
+
+  const [slidesPerView, setSlidesPerView] = useState(getSlidesPerView());
+  const totalSlides = Math.ceil(displayProducts.length / slidesPerView);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSlidesPerView(getSlidesPerView());
+      // Reset to first slide on resize to avoid overflow
+      setCurrentIndex(0);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Auto slide functionality
+  useEffect(() => {
+    if (!isPaused && displayProducts.length > 0) {
+      slideInterval.current = setInterval(() => {
+        nextSlide();
+      }, autoSlideDuration);
+    }
+
+    return () => {
+      if (slideInterval.current) {
+        clearInterval(slideInterval.current);
+      }
+    };
+  }, [currentIndex, isPaused, displayProducts.length, slidesPerView]);
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === totalSlides - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? totalSlides - 1 : prevIndex - 1
+    );
+  };
+
+  const goToSlide = (index) => {
+    setCurrentIndex(index);
+  };
+
+  const handleAddToCart = (product, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product);
+  };
+
+  const handleMouseEnter = () => {
+    setIsPaused(true);
+    if (slideInterval.current) {
+      clearInterval(slideInterval.current);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsPaused(false);
+  };
+
+  if (displayProducts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">No products available</p>
+      </div>
+    );
+  }
+
+  // Calculate which products to show based on current index
+  const startIndex = currentIndex * slidesPerView;
+  const visibleProducts = displayProducts.slice(
+    startIndex,
+    startIndex + slidesPerView
+  );
+
+  return (
+    <div
+      className="relative px-4 md:px-8 lg:px-12 py-8 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl shadow-lg"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Header with title and controls */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+        <div className="mb-4 sm:mb-0">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            Featured Products
+          </h2>
+          <p className="text-gray-600 mt-1">
+            Discover our best selling pharmaceutical products
+          </p>
+        </div>
+
+        {/* Navigation buttons */}
+        <div className="flex items-center space-x-4">
+          <div className="flex space-x-2">
+            <button
+              onClick={prevSlide}
+              className="p-2 md:p-3 bg-white border border-gray-300 rounded-full shadow-md hover:bg-blue-50 hover:border-blue-500 transition-all duration-300 transform hover:-translate-x-0.5 active:scale-95"
+              aria-label="Previous slide"
+            >
+              <FiChevronLeft className="text-gray-700 text-lg md:text-xl" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="p-2 md:p-3 bg-white border border-gray-300 rounded-full shadow-md hover:bg-blue-50 hover:border-blue-500 transition-all duration-300 transform hover:translate-x-0.5 active:scale-95"
+              aria-label="Next slide"
+            >
+              <FiChevronRight className="text-gray-700 text-lg md:text-xl" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Products grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        {visibleProducts.map((product) => (
+          <div
+            key={product.id}
+            className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden group"
+          >
+            {/* Product image */}
+            <div className="relative h-48 md:h-56 overflow-hidden">
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                onError={(e) => {
+                  e.target.src = `https://via.placeholder.com/400x300/3b82f6/ffffff?text=${encodeURIComponent(
+                    product.title
+                  )}`;
+                }}
+              />
+              {/* Company badge */}
+              <div className="absolute top-3 right-3">
+                <span className="px-2 py-1 bg-blue-600 text-white text-xs font-medium rounded-full shadow-md">
+                  {product.company}
+                </span>
+              </div>
+            </div>
+
+            {/* Product info */}
+            <div className="p-4 md:p-6">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-bold text-gray-900 text-sm md:text-base line-clamp-1 flex-1 mr-2">
+                  {product.title}
+                </h3>
+                <div className="text-blue-900 font-bold text-base md:text-lg whitespace-nowrap">
+                  ${product.price.toFixed(2)}
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-xs md:text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
+                    {product.mg}mg
+                  </span>
+                  <span className="text-xs md:text-sm text-gray-500">•</span>
+                  <span className="text-xs md:text-sm text-gray-500 truncate">
+                    {product.composition}
+                  </span>
+                </div>
+                <p className="text-gray-600 text-xs md:text-sm line-clamp-2">
+                  {product.description}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center text-xs md:text-sm text-gray-500">
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                  {product.packing}
+                </div>
+                <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800">
+                  {product.category}
+                </span>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex space-x-3">
+                <Link
+                  to={`/product/${product.id}`}
+                  className="flex-1 px-3 py-2 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-center text-sm transition duration-300"
+                >
+                  View Details
+                </Link>
+                <button
+                  onClick={(e) => handleAddToCart(product, e)}
+                  className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center text-sm"
+                >
+                  <FiShoppingCart className="mr-2" />
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Slide indicators (dots) */}
+      <div className="flex justify-center items-center mt-8 space-x-2">
+        {Array.from({ length: totalSlides }).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
+              index === currentIndex
+                ? "bg-blue-600 scale-125"
+                : "bg-gray-300 hover:bg-gray-400"
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Auto slide status indicator */}
+      <div className="mt-6 flex justify-center items-center">
+        <div className="flex items-center space-x-2">
+          <div
+            className={`w-3 h-3 rounded-full ${
+              isPaused ? "bg-yellow-500" : "bg-green-500"
+            }`}
+          ></div>
+          <span className="text-xs text-gray-500">
+            {isPaused ? "Paused (hovering)" : "Auto-sliding every 3s"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MarqueeSlider;
