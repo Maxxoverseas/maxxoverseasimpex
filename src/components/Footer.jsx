@@ -24,9 +24,9 @@ const Footer = () => {
     { name: "About Us", path: "/about" },
     { name: "Products", path: "/products" },
     { name: "Contact Us", path: "/contact" },
-    { name: " Reviews", path: "/reviews" },
-    { name: "Privacy Policy", path: "/" },
-    { name: "Terms & Conditions", path: "/" },
+    { name: "Reviews", path: "/reviews" },
+    { name: "Privacy Policy", path: "/privacy" },
+    { name: "Terms & Conditions", path: "/terms" },
   ];
 
   const productCategories = [
@@ -63,13 +63,54 @@ const Footer = () => {
     "United Kingdom",
     "Canada",
     "Australia",
-
     "South Africa",
     "Germany",
-
     "Japan",
     "Singapore",
     "Malaysia",
+  ];
+
+  const paymentMethods = [
+    {
+      name: "PayPal",
+      image:
+        "https://i.pcmag.com/imagery/reviews/068BjcjwBw0snwHIq0KNo5m-15..v1602794215.png",
+      bgColor: "bg-blue-50",
+    },
+    {
+      name: "Crypto",
+      image:
+        "https://img.freepik.com/free-vector/cryptocurrency-bitcoin-golden-coin-background_1017-31505.jpg?semt=ais_hybrid&w=740&q=80",
+      bgColor: "bg-orange-50",
+    },
+    {
+      name: "Venmo",
+      image:
+        "https://images.prismic.io/bigcartel-staging/Z-IxSndAxsiBv2YN_venmo.png?auto=format,compress&rect=320,0,800,600&w=1800&h=1350",
+      bgColor: "bg-blue-50",
+    },
+    {
+      name: "Zelle",
+      image: "https://firstcu.net/wp-content/uploads/2022/11/zelle-logo.png",
+      bgColor: "bg-purple-50",
+    },
+    {
+      name: "Credit Cards",
+      image: "https://cdn-icons-png.flaticon.com/512/179/179457.png",
+      bgColor: "bg-gray-50",
+    },
+    {
+      name: "Apple Pay",
+      image: "https://cdn-icons-png.flaticon.com/512/179/179457.png",
+      bgColor: "bg-black",
+    },
+  ];
+
+  const socialLinks = [
+    { icon: <FiFacebook />, url: "#", color: "hover:text-blue-400" },
+    { icon: <FiTwitter />, url: "#", color: "hover:text-sky-400" },
+    { icon: <FiLinkedin />, url: "#", color: "hover:text-blue-600" },
+    { icon: <FiInstagram />, url: "#", color: "hover:text-pink-500" },
   ];
 
   return (
@@ -79,7 +120,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <Link to="/" className="flex items-center space-x-2 hover:bg-white">
+            <Link to="/" className="flex items-center space-x-2 bg-white">
               <img src={logo} alt="Logo" className="h-28 w-36 object-contain" />
             </Link>
 
@@ -89,7 +130,7 @@ const Footer = () => {
               products worldwide.
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-3 mb-6">
               <div className="flex items-center">
                 <FiCheckCircle className="text-green-400 mr-2" />
                 <span className="text-sm">WHO-GMP Certified</span>
@@ -101,6 +142,44 @@ const Footer = () => {
               <div className="flex items-center">
                 <FiTruck className="text-yellow-400 mr-2" />
                 <span className="text-sm">Worldwide Shipping</span>
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div className="mb-6">
+              <h5 className="font-bold mb-3 text-blue-300">Follow Us</h5>
+              <div className="flex space-x-4">
+                {socialLinks.map((social, index) => (
+                  <a
+                    key={index}
+                    href={social.url}
+                    className={`text-gray-400 text-xl transition duration-300 ${social.color}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Payment Methods */}
+            <div>
+              <h5 className="font-bold mb-3 text-blue-300">Payment Methods</h5>
+              <div className="flex flex-wrap gap-2">
+                {paymentMethods.map((method, index) => (
+                  <div
+                    key={index}
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${method.bgColor} p-1`}
+                    title={method.name}
+                  >
+                    <img
+                      src={method.image}
+                      alt={method.name}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -250,7 +329,33 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Middle Section - Newsletter & Social */}
+      {/* Middle Section - Newsletter */}
+      <div className="bg-gray-800 py-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h3 className="text-2xl font-bold mb-4">
+              Subscribe to Our Newsletter
+            </h3>
+            <p className="text-gray-300 mb-6">
+              Get updates on new products, offers, and industry insights
+            </p>
+            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-grow px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
 
       {/* Bottom Section - Copyright */}
       <div className="bg-gray-950 py-6">
@@ -269,28 +374,28 @@ const Footer = () => {
 
             <div className="flex flex-wrap justify-center gap-4 text-sm">
               <Link
-                to=""
+                to="/privacy"
                 className="text-gray-400 hover:text-white transition duration-300"
               >
                 Privacy Policy
               </Link>
               <span className="text-gray-600">•</span>
               <Link
-                to=""
+                to="/terms"
                 className="text-gray-400 hover:text-white transition duration-300"
               >
                 Terms of Service
               </Link>
               <span className="text-gray-600">•</span>
               <Link
-                to=""
+                to="/sitemap"
                 className="text-gray-400 hover:text-white transition duration-300"
               >
                 Sitemap
               </Link>
               <span className="text-gray-600">•</span>
               <a
-                href=""
+                href="#certifications"
                 className="text-gray-400 hover:text-white transition duration-300"
               >
                 Certifications
